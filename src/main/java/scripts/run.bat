@@ -1,0 +1,1 @@
+"./jre/bin/java.exe" -Xms128m -Xmx1024m -classpath "${classPath}" ${mainClass}
