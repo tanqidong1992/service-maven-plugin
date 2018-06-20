@@ -62,7 +62,7 @@ public class App extends AbstractMojo
 		log=getLog();
 		log.info("start to pakcage win");
 		String buildOutputPath=mavenProject.getBuild().getDirectory();
-		List<Plugin> plugins=mavenProject.getBuildPlugins();
+		List<Plugin> plugins=mavenProject.getBuildPlugins();		
 		String jarFileName=generateJarFileName();
 		String originalJarFileName=jarFileName;
 		log.info("target jar file name is "+jarFileName);

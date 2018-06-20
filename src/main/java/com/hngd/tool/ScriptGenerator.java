@@ -27,6 +27,12 @@ public class ScriptGenerator {
 	public static final String STOP="stop.bat";
 	public static final String UNINSTALL="uninstall.bat";
 	public static final String KEY_SUPPORT_SERVICE="supportService";
+	
+	public static final String KEY_JVM_MS="jvmMs";
+	public static final String KEY_JVM_MX="jvmMx";
+	public static final String DEFAULT_JVM_MS="256m";
+	public static final String DEFAULT_JVM_MX="512m";
+	
     public static void generateScripts(File configFile,File workdir,File dependenciesDirectory,File jarFile) throws IOException
     {
     	 
@@ -39,7 +45,8 @@ public class ScriptGenerator {
     	Configuration cfg = Configuration.defaultConfiguration();
     	GroupTemplate gt = new GroupTemplate(resourceLoader, cfg);
     	Map<String,Object> context=new HashMap<>();
-    	 
+    	context.put(KEY_JVM_MS, DEFAULT_JVM_MS);
+    	context.put(KEY_JVM_MX, DEFAULT_JVM_MX);
     	String classpath=processClassPath(dependenciesDirectory,jarFile);
     	context.put("classPath", classpath);
     	properties.forEach((k,v)->{

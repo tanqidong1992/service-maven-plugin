@@ -13,7 +13,7 @@ prunsrv //IS//${serviceName} ^
  --StopClass=${mainClass} ^
  --StartMethod=${startMethod} ^
  --StopMethod=${stopMethod} ^
- --JvmMs=128m ^
- --JvmMx=1024m
+ --JvmMs=${jvmMs} ^
+ --JvmMx=${jvmMx}
  
  
