@@ -98,7 +98,8 @@ public class ScriptGenerator {
 		StringBuilder sb=new StringBuilder();
         for (int i = 0; i < files.length; i++)
         {
-            String fn = files[i].getAbsolutePath();
+        	File file=files[i];
+            String fn = "."+File.separator+file.getParentFile().getName()+File.separator+file.getName();
             sb.append(fn + ";");
         }
         sb.append(jarFile.getAbsolutePath());

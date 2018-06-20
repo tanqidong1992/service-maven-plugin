@@ -16,6 +16,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.hngd.tool.utils.JreUtils;
+
 /**
  * Hello world!
  *
@@ -26,23 +28,23 @@ public class App extends AbstractMojo
 	/**
 	 * jre directory for copy
 	 */
-	@Parameter
+	@Parameter(required=false)
     public File jreDirectory;
 	
 	/**
 	 * config properties fot generate script
 	 */
-	@Parameter
+	@Parameter(required=true)
     public File scriptConfigFile;
 	/**
 	 * the directory to save the package file
 	 */
-    @Parameter
+    @Parameter(required=true)
     public File outputDirectory;
     /**
      * the directory contains dependent library
      */
-    @Parameter
+    @Parameter(required=true)
     public File dependencyDirectory;
     /**
      * config and data directories
@@ -109,7 +111,11 @@ public class App extends AbstractMojo
 		}
 		
 		log.info("copy jre");
-		
+		if(jreDirectory==null){
+			String defaultJrePath=JreUtils.getDefaultJrePath();
+			log.info("jreDirectory is empty using default jre path:"+defaultJrePath);
+			jreDirectory=new File(defaultJrePath);
+		}
 		File outputJreDirectory=new File(outputDirectory, "jre");
 		if(outputJreDirectory.exists()) {
 			outputJreDirectory.delete();
