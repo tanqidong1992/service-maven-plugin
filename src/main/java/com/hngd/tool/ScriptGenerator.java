@@ -32,7 +32,9 @@ public class ScriptGenerator {
 	public static final String KEY_JVM_MX="jvmMx";
 	public static final String DEFAULT_JVM_MS="256m";
 	public static final String DEFAULT_JVM_MX="512m";
-	
+	public static final String KEY_SERVICE_DESCRIPTION="serviceDescription";
+	public static final String KEY_SERVICE_DISPLAY_NAME="serviceDisplayName";
+	public static final String KEY_SERVICE_NAME="serviceName";
     public static void generateScripts(File configFile,File workdir,File dependenciesDirectory,File jarFile) throws IOException
     {
     	 
@@ -40,7 +42,6 @@ public class ScriptGenerator {
 		Properties properties=loadConfig(configPath);
     	 
     	String root="/scripts";
-		//StringTemplateResourceLoader resourceLoader = new StringTemplateResourceLoader();
     	ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(root,"utf-8");
     	Configuration cfg = Configuration.defaultConfiguration();
     	GroupTemplate gt = new GroupTemplate(resourceLoader, cfg);
@@ -52,6 +53,13 @@ public class ScriptGenerator {
     	properties.forEach((k,v)->{
     		context.put((String) k, v);
     	});
+    	String serviceName=properties.getProperty(KEY_SERVICE_NAME);
+    	if(properties.getProperty(KEY_SERVICE_DISPLAY_NAME)==null){
+    		properties.setProperty(KEY_SERVICE_DISPLAY_NAME, serviceName);
+    	}
+    	if(properties.getProperty(KEY_SERVICE_DESCRIPTION)==null){
+    		properties.setProperty(KEY_SERVICE_DESCRIPTION, serviceName);
+    	}
     	String supportService=properties.getProperty(KEY_SUPPORT_SERVICE);
     	if("true".equals(supportService)) {
     		Template install = gt.getTemplate(INSTALL);
@@ -109,7 +117,7 @@ public class ScriptGenerator {
             String fn = "."+File.separator+file.getParentFile().getName()+File.separator+file.getName();
             sb.append(fn + ";");
         }
-        sb.append(jarFile.getAbsolutePath());
+        sb.append(jarFile.getName());
         //sb.deleteCharAt(sb.length()-1);
 		return sb.toString();
 	}

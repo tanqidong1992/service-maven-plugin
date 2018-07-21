@@ -1,4 +1,5 @@
 prunsrv //IS//${serviceName} ^
+ --Description "${serviceDescription}" ^
  --DisplayName="${serviceDisplayName}" ^
  --Startup=auto ^
  --Jvm=".\jre\bin\server\jvm.dll" ^

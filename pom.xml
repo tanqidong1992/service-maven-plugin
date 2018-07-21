@@ -4,7 +4,7 @@
 
 	<groupId>com.hngd.tool</groupId>
 	<artifactId>maven-winpackage-plugin</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>maven-winpackage-plugin</name>
