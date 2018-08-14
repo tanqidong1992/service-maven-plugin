@@ -107,13 +107,12 @@
 	</build>
 
 
-	<distributionManagement>
-		<repository>
-			<id>hnoe-tfs-maven-plugin</id>
-			<url>http://hnoe-tfs:8080/tfs/DefaultCollection/_packaging/maven-plugin/maven/v1</url>
-		</repository>
-		
-	</distributionManagement>
+			<distributionManagement>
+  <repository>
+    <id>maven-deploy</id>
+    <url>http://192.168.0.143:8082/nexus/content/repositories/releases/</url>
+  </repository>
+</distributionManagement>
 
 
 </project>
