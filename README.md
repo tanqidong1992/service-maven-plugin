@@ -2,13 +2,30 @@
 
 ##### 实现功能
 
-这是一个maven插件项目,用于生成windows下的java程序包，程序包包含，可行性jar文件，依赖的第三方jar文件，程序运行依赖的java运行时，数据，生成的运行脚本（支持NT服务方式）。
+这是一个maven插件项目,主要用于生成windows下支持以服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本。此插件依赖maven-dependency-plugin,支持Spring boot项目.
 
 ##### 使用
 
 1. 插件坐标
 
    ```xml
+   			<plugin>
+   				<groupId>org.apache.maven.plugins</groupId>
+   				<artifactId>maven-dependency-plugin</artifactId>
+   				<executions>
+   					<execution>
+   						<id>copy-dependencies</id>
+   						<phase>package</phase>
+   						<goals>
+   							<goal>copy-dependencies</goal>
+   						</goals>
+   						<configuration>
+   							<outputDirectory>${project.build.directory}/libs</outputDirectory>
+   						</configuration>
+   					</execution>
+   
+   				</executions>
+   			</plugin>
    <plugin>
    				<groupId>com.hngd.tool</groupId>
    				<artifactId>maven-winpackage-plugin</artifactId>
@@ -21,8 +38,8 @@
    						<phase>package</phase>
    						<configuration>
    						    <jreDirectory>C:\\Program Files\\Java\\jre1.8.0_121</jreDirectory>
-   						    <scriptConfigFile>${basedir}/package-config/punchSystem.properties</scriptConfigFile>
-   							<outputDirectory>${project.build.directory}/winpackage</outputDirectory>
+   						    <scriptConfigFile>${basedir}/package-config/package.properties</scriptConfigFile>
+   							<outputDirectory>${project.build.directory}/${artifactId}</outputDirectory>
    							<dependencyDirectory>${project.build.directory}/libs</dependencyDirectory>
    						    <configAndDataDirectories>
    						    <param>${basedir}/config</param>
@@ -35,42 +52,29 @@
    			</plugin>
    ```
 
-   插件远程仓库地址
-
-   ```xml
-   <repository>
-     <id>hnoe-tfs-maven-plugin</id>
-     <url>http://hnoe-tfs:8080/tfs/DefaultCollection/_packaging/maven-plugin/maven/v1</url>
-     <releases>
-       <enabled>true</enabled>
-     </releases>
-     <snapshots>
-       <enabled>true</enabled>
-     </snapshots>
-   </repository>
-   ```
-
-2. 配置文件说明
+2. 配置文件说明(${basedir}/package-config/package.properties)
 
    ```properties
    #NT服务名称
-   serviceName=HnPunchSystem        
+   serviceName=demo-service        
    #NT服务显示名称
-   serviceDisplayName=HnPunchSystem
+   serviceDisplayName=demo-service
+   #NT服务描述内容
+   serviceDescription=测试服务
    #Java程序入口类
    mainClass=com.hngd.NtServiceMain
    #NT服务启动时，调用Java方法
    startMethod=onStart     
    #NT服务停止时，调用Java方法
    stopMethod=onStop
-   #是否生成NT服务，安装，启动，停止，卸载脚本
+   #是否生成NT服务的安装，启动，停止，卸载脚本
    supportService=true
+   #java虚拟机内存配置
+   jvmMs=512m
+   jvmMx=1024m
    #更多参数设置将在后续支持
    ```
 
-3. 示例项目参考
-
-   1. [考勤系统](http://192.168.0.143:8080/tfs/DefaultCollection/TfsDemo/TfsDemo%20%E5%9B%A2%E9%98%9F/_git/PunchSystem)
 
 ##### 编译环境
 

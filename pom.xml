@@ -98,21 +98,26 @@
 			</plugin>
 		</plugins>
 		<resources>
-		<resource><directory>src/main/java</directory>
+			<resource>
+				<directory>src/main/java</directory>
 				<includes>
 					<include>**/*.bat</include>
 					<include>**/*.exe</include>
-				</includes></resource>
+				</includes>
+			</resource>
 		</resources>
 	</build>
 
 
-			<distributionManagement>
-  <repository>
-    <id>maven-deploy</id>
-    <url>http://192.168.0.143:8082/nexus/content/repositories/releases/</url>
-  </repository>
-</distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>maven-deploy</id>
+			<url>http://192.168.0.143:8082/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
 
 
+	<modules>
+		<module>?</module>
+	</modules>
 </project>
