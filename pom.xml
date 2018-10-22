@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hngd.tool</groupId>
-	<artifactId>maven-winpackage-plugin</artifactId>
-	<version>0.0.4</version>
+	<artifactId>winpackage-maven-plugin</artifactId>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
-	<name>maven-winpackage-plugin</name>
+	<name>winpackage-maven-plugin</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
@@ -112,12 +112,8 @@
 	<distributionManagement>
 		<repository>
 			<id>maven-deploy</id>
-			<url>http://192.168.0.143:8082/nexus/content/repositories/releases/</url>
+			<url>http://192.168.0.143:8082/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>
-
-
-	<modules>
-		<module>?</module>
-	</modules>
+ 
 </project>
