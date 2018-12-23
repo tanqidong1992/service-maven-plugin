@@ -31,7 +31,7 @@ public class App extends AbstractMojo {
 	public File jreDirectory;
 
 	/**
-	 * config properties fot generate script
+	 * config properties for  script generation
 	 */
 	@Parameter(required = true)
 	public File scriptConfigFile;
@@ -41,7 +41,7 @@ public class App extends AbstractMojo {
 	@Parameter(required = true)
 	public File outputDirectory;
 	/**
-	 * the directory contains dependent library
+	 * the directory contains dependent libraries
 	 */
 	@Parameter(required = true)
 	public File dependencyDirectory;
@@ -81,8 +81,7 @@ public class App extends AbstractMojo {
 			try {
 				FileUtils.deleteDirectory(outputDirectory);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("",e);
 			}
 
 		}
@@ -191,10 +190,10 @@ public class App extends AbstractMojo {
 		if (plugins == null || plugins.size() <= 0) {
 			return false;
 		}
-		return plugins.stream().filter(plugin -> {
-			return plugin.getArtifactId().equals(SPRING_BOOT_PLUGIN_ARTIFACT_ID);
-		}).findAny().isPresent();
-
+		return plugins.stream()
+				.filter(plugin -> plugin.getArtifactId().equals(SPRING_BOOT_PLUGIN_ARTIFACT_ID))
+				.findAny()
+				.isPresent();
 	}
 
 }

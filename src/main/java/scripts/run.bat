@@ -1,1 +1,1 @@
-"./jre/bin/java.exe" -Xms${jvmMs} -Xmx${jvmMx} -classpath "${classPath}" ${mainClass}
+"./jre/bin/java.exe" ${javaRunOptions} -Xms${jvmMs} -Xmx${jvmMx} -classpath "${classPath}" ${mainClass}
