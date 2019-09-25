@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.hngd.tool</groupId>
-	<artifactId>winpackage-maven-plugin</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<artifactId>service-maven-plugin</artifactId>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>winpackage-maven-plugin</name>
@@ -111,7 +111,7 @@
 
 	<distributionManagement>
 		<repository>
-			<id>maven-deploy</id>
+			<id>hn-local-143</id>
 			<url>http://192.168.0.143:8082/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>

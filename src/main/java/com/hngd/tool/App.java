@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -14,6 +15,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.hngd.tool.utils.JreUtils;
@@ -29,7 +31,6 @@ public class App extends AbstractMojo {
 	 */
 	@Parameter(required = false)
 	public File jreDirectory;
-
 	/**
 	 * config properties for  script generation
 	 */
@@ -41,11 +42,6 @@ public class App extends AbstractMojo {
 	@Parameter(required = true)
 	public File outputDirectory;
 	/**
-	 * the directory contains dependent libraries
-	 */
-	@Parameter(required = true)
-	public File dependencyDirectory;
-	/**
 	 * config and data directories
 	 */
 	@Parameter
@@ -53,6 +49,14 @@ public class App extends AbstractMojo {
 
 	@Component
 	public MavenProject mavenProject;
+	
+	@Parameter(defaultValue = "${session}", readonly = true)
+	private MavenSession session;
+	// TODO: This is internal maven, we should find a better way to do this
+	@Component
+	private ProjectDependenciesResolver projectDependenciesResolver;
+	@Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
+	private List<MavenProject> projects;
 
 	Log log;
 
@@ -86,12 +90,7 @@ public class App extends AbstractMojo {
 
 		}
 		outputDirectory.mkdirs();
-		File outDependencyDirectory = null;
-		try {
-			outDependencyDirectory = copyDependencies();
-		} catch (IOException e) {
-			log.error("", e);
-		}
+		File outDependencyDirectory = copyDependencies();
 		log.info("copy package jar file");
 		File packageJarFile = new File(outputDirectory, originalJarFileName);
 		try {
@@ -166,15 +165,28 @@ public class App extends AbstractMojo {
 
 	}
 
-	private File copyDependencies() throws IOException {
+	private File copyDependencies() throws MojoExecutionException {
 		log.info("start to copy dependencies");
 		File outDependencyDirectory = new File(outputDirectory, "libs");
 		if (outDependencyDirectory.exists()) {
-			FileUtils.deleteDirectory(outDependencyDirectory);
+			try {
+				FileUtils.deleteDirectory(outDependencyDirectory);
+			} catch (IOException e) {
+				throw new MojoExecutionException("deleet copy dependencies output dir :"+outDependencyDirectory.getAbsolutePath()+" failed", e);
+			}
 		}
 		outDependencyDirectory.mkdirs();
-		FileUtils.copyDirectoryStructure(dependencyDirectory, outDependencyDirectory);
-
+		List<File> dependencies=ResolveDependencies.getDependencies(mavenProject, session, projectDependenciesResolver, projects);
+		if(dependencies!=null) {
+			for(File f:dependencies) {
+				try {
+					FileUtils.copyFileToDirectory(f, outDependencyDirectory);
+				} catch (IOException e) {
+					log.error("copy dependency file:"+f.getAbsolutePath()+" failed", e);
+					throw new MojoExecutionException("copy dependency file:"+f.getAbsolutePath()+" failed", e);
+				}
+			}
+		}
 		return outDependencyDirectory;
 	}
 
