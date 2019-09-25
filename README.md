@@ -2,34 +2,18 @@
 
 ##### 实现功能
 
-这是一个maven插件项目,主要用于生成windows下支持以服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本。此插件依赖maven-dependency-plugin,支持Spring boot项目.
+这是一个maven插件项目,主要用于生成windows下支持以服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本。支持Spring boot项目.
 
 ##### 使用
 
 1. 插件坐标
 
    ```xml
-   			<plugin>
-   				<groupId>org.apache.maven.plugins</groupId>
-   				<artifactId>maven-dependency-plugin</artifactId>
-   				<executions>
-   					<execution>
-   						<id>copy-dependencies</id>
-   						<phase>package</phase>
-   						<goals>
-   							<goal>copy-dependencies</goal>
-   						</goals>
-   						<configuration>
-   							<outputDirectory>${project.build.directory}/libs</outputDirectory>
-   						</configuration>
-   					</execution>
    
-   				</executions>
-   			</plugin>
-   <plugin>
+                <plugin>
    				<groupId>com.hngd.tool</groupId>
-   				<artifactId>maven-winpackage-plugin</artifactId>
-   				<version>0.0.1</version>
+   				<artifactId>service-maven-plugin</artifactId>
+   				<version>0.0.5-SNAPSHOT</version>
    				<executions>
    					<execution>
    						<goals>
@@ -40,7 +24,7 @@
    						    <jreDirectory>C:\\Program Files\\Java\\jre1.8.0_121</jreDirectory>
    						    <scriptConfigFile>${basedir}/package-config/package.properties</scriptConfigFile>
    							<outputDirectory>${project.build.directory}/${artifactId}</outputDirectory>
-   							<dependencyDirectory>${project.build.directory}/libs</dependencyDirectory>
+   
    						    <configAndDataDirectories>
    						    <param>${basedir}/config</param>
    						    <param>${basedir}/data</param>
@@ -51,7 +35,7 @@
    				</executions>
    			</plugin>
    ```
-
+   
 2. 配置文件说明(${basedir}/package-config/package.properties)
 
    ```properties
