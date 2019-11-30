@@ -1,10 +1,10 @@
-#### 简介
+# 简介
 
-##### 实现功能
+## 实现功能
 
 这是一个maven插件项目,主要用于生成windows下支持以服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本。支持Spring boot项目.
 
-##### 使用
+## 使用
 
 1. 插件坐标
 
@@ -60,12 +60,12 @@
    ```
 
 
-##### 编译环境
+## 编译环境
 
-1. Oracle JDK 1.8
-2. Apache Maven 3.3.3.
+1. Oracle JDK 1.8.
+2. Apache Maven 3.3.3及以上.
 
-##### 编译
+## 编译
 
 ```shell
 mvn package //打包
@@ -73,7 +73,6 @@ mvn install //安装到本地
 mvn deploy //发布程序包
 ```
 
-##### 相关资料
+## 相关资料
 
-1. 如何发布包到TFS包管理器
-2. maven 插件开发
+1. [maven 插件开发](https://maven.apache.org/plugin-developers/index.html)

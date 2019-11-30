@@ -19,7 +19,8 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.ClasspathResourceLoader;
-import org.beetl.core.resource.FileResourceLoader;
+
+import com.hngd.tool.exception.ScriptGenerationException;
 
 public class ScriptGenerator {
 
@@ -41,13 +42,17 @@ public class ScriptGenerator {
 	private static final String SCRIPT_TEMPLATE_ROOT="/scripts";
 	public static final String KEY_CLASS_PATH="classPath";
 	private static final String DEFAULT_JAVA_RUN_OPTIONS = "";
-    public static void generateScripts(File configFile,File workdir,File dependenciesDirectory,File jarFile) throws IOException
-    {
+    public static void generateScripts(File configFile,File workdir,File dependenciesDirectory,File jarFile) throws ScriptGenerationException{
     	 
     	String configPath=configFile.getAbsolutePath();
 		Properties properties=loadConfig(configPath);
     	ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(SCRIPT_TEMPLATE_ROOT,"utf-8");
-    	Configuration cfg = Configuration.defaultConfiguration();
+    	Configuration cfg=null;
+		try {
+			cfg = Configuration.defaultConfiguration();
+		} catch (IOException e) {
+			throw new ScriptGenerationException("模板引擎初始化失败!",e);
+		}
     	GroupTemplate groupTemplate = new GroupTemplate(resourceLoader, cfg);
     	Map<String,Object> context=new HashMap<>();
     	context.put(KEY_JAVA_RUN_OPTIONS, DEFAULT_JAVA_RUN_OPTIONS);
@@ -65,12 +70,21 @@ public class ScriptGenerator {
     	}
     	String supportService=properties.getProperty(KEY_SUPPORT_SERVICE);
     	if("true".equals(supportService)) {
-    		generateServiceScript(workdir,groupTemplate,context);
+    		try {
+				generateServiceScript(workdir,groupTemplate,context);
+			} catch (BeetlException | IOException e) {
+				throw new ScriptGenerationException("生成服务脚本错误!",e);
+			}
     	}
     	 
         Template run=groupTemplate.getTemplate(RUN);
     	run.binding(context);
-    	Files.write(new File(workdir,RUN).toPath(), run.render().getBytes(), StandardOpenOption.CREATE);
+    	File runBatFile=new File(workdir,RUN);
+    	try {
+			Files.write(runBatFile.toPath(), run.render().getBytes(), StandardOpenOption.CREATE);
+		} catch (BeetlException | IOException e) {
+			throw new ScriptGenerationException("文件"+runBatFile.getAbsolutePath()+"写入操作错误!",e);
+		}
     }
 
 	private static void generateServiceScript(File workdir,GroupTemplate groupTemplate, Map<String, Object> context) throws BeetlException, IOException {
@@ -98,7 +112,7 @@ public class ScriptGenerator {
         try(InputStream in=ScriptGenerator.class.getResourceAsStream("/tools/prunsrv.exe")){
         	Files.copy(in, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }catch(IOException e) {
-        	e.printStackTrace();
+        	throw e;
         }
 		
 	}
@@ -110,9 +124,9 @@ public class ScriptGenerator {
 			properties.load(reader);
 		} catch (IOException e) {
 			if(e instanceof FileNotFoundException){
-				throw new RuntimeException("配置文件不存在",e);
+				throw new RuntimeException("配置文件"+configPath+"不存在",e);
 			}else {
-				throw new RuntimeException("配置文件读取失败",e);
+				throw new RuntimeException("配置文件"+configPath+"读取失败",e);
 			}
 		} 
 		return properties;

@@ -1,4 +1,4 @@
-package com.hngd.tool;
+package com.hngd.tool.mojo;
 
 import java.io.File;
 import java.util.List;
@@ -40,8 +40,8 @@ public class ResolveDependencies extends AbstractMojo{
 	// TODO: This is internal maven, we should find a better way to do this
 	@Component
 	private ProjectDependenciesResolver projectDependenciesResolver;
-	  @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
-	  private List<MavenProject> projects;
+	@Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
+	private List<MavenProject> projects;
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		
@@ -114,12 +114,10 @@ public class ResolveDependencies extends AbstractMojo{
 	}
 	
 	
-	public static List<File> getDependencies(MavenProject project,
-			MavenSession session,
-			ProjectDependenciesResolver projectDependenciesResolver,
-			List<MavenProject> projects) throws MojoExecutionException{
-	    Set<String> projectArtifacts =
-		        projects
+	public static List<File> getDependencies(MavenProject project,MavenSession session,
+	    ProjectDependenciesResolver projectDependenciesResolver,List<MavenProject> projects) 
+					throws MojoExecutionException{
+	    Set<String> projectArtifacts =projects
 		            .stream()
 		            .map(MavenProject::getArtifact)
 		            .map(Artifact::toString)

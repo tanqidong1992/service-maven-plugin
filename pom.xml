@@ -4,31 +4,32 @@
 
 	<groupId>com.hngd.tool</groupId>
 	<artifactId>service-maven-plugin</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>winpackage-maven-plugin</name>
 	<url>http://maven.apache.org</url>
-
+    
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.version>3.3.9</maven.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.ibeetl</groupId>
 			<artifactId>beetl</artifactId>
-			<version>2.7.26</version>
+			<version>2.9.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-plugin-api</artifactId>
-			<version>3.3.9</version>
+			<version>${maven.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.5</version>
+			<version>3.6.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -45,7 +46,7 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
-			<version>3.3.9</version>
+			<version>${maven.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -54,7 +55,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>3.5.2</version>
+				<version>3.6.0</version>
 				<configuration>
 					<skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
 					<skipDescriptor>false</skipDescriptor>
@@ -73,19 +74,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
-						<phase>package</phase>
+						<phase>verify</phase>
 						<goals>
 							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-
-				</configuration>
 			</plugin>
 
 			<plugin>
@@ -107,7 +105,6 @@
 			</resource>
 		</resources>
 	</build>
-
 
 	<distributionManagement>
 		<repository>
