@@ -38,9 +38,9 @@ public class NtServicePackageMojo extends AbstractMojo {
 	@Parameter(required = true)
 	public File scriptConfigFile;
 	/**
-	 * the directory to save the package file
+	 * the directory to save the package file,the default value is  ${project.build.directory}/${project.artifactId}
 	 */
-	@Parameter(required = true)
+	@Parameter(required = false)
 	public File outputDirectory;
 	/**
 	 * resource directories
@@ -66,6 +66,11 @@ public class NtServicePackageMojo extends AbstractMojo {
 		log = getLog();
 		log.debug("Start to package Windows NT Service");
 		String buildOutputPath = mavenProject.getBuild().getDirectory();
+		String artifactId=mavenProject.getArtifactId();
+		if(outputDirectory==null) {
+			outputDirectory=new File(buildOutputPath, artifactId);
+		}
+		
 		String jarFileName = MavenProjectUtils.generateJarFileName(mavenProject);
 		String originalJarFileName = jarFileName;
 		log.debug("target jar file name is " + jarFileName);
