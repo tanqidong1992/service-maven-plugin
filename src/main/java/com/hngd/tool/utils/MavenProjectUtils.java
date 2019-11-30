@@ -20,9 +20,9 @@ import org.eclipse.aether.graph.DependencyFilter;
 public class MavenProjectUtils {
 
 	public static String generateJarFileName(MavenProject mavenProject) {
-		String name = mavenProject.getName();
+		String artifactId=mavenProject.getArtifactId();
 		String version = mavenProject.getVersion();
-		return name + "-" + version + ".jar";
+		return artifactId + "-" + version + ".jar";
 	}
 	
 	public static final String SPRING_BOOT_PLUGIN_ARTIFACT_ID = "spring-boot-maven-plugin";
