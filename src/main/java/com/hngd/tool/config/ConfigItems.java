@@ -5,8 +5,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hngd.tool.constant.Constants;
+
 public class ConfigItems {
 
+	
+	public static final String INNER_PROJECT_NAME="#projectName";
+	public static final String INNER_PROJECT_DESCRIPTION="#projectDescription";
+	public static final String INNER_PROJECT_MAIN_CLASS="#projectMainClass";
+	public static final String INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE="#projectMainClassSupportService";
 	public static final String KEY_SUPPORT_SERVICE = "supportService";
 	public static final String KEY_SERVICE_DESCRIPTION = "serviceDescription";
 	public static final String KEY_SERVICE_DISPLAY_NAME = "serviceDisplayName";
@@ -24,9 +31,9 @@ public class ConfigItems {
 	 * 服务启动方式,默认为manual,Service startup mode can be either delayed, auto or manual
 	 */
 	public static ConfigItem STARTUP = new ConfigItem(KEY_STARTUP, false, "manual");
-	public static ConfigItem START_METHOD = new ConfigItem(KEY_START_METHOD, false, null);
-	public static ConfigItem STOP_METHOD = new ConfigItem(KEY_STOP_METHOD, false, null);
-	public static ConfigItem MAIN_CLASS = new ConfigItem(KEY_MAIN_CLASS, false, null);
+	public static ConfigItem START_METHOD = new ConfigItem(KEY_START_METHOD, false, Constants.DEFAULT_ON_START_METHOD_NAME);
+	public static ConfigItem STOP_METHOD = new ConfigItem(KEY_STOP_METHOD, false, Constants.DEFAULT_ON_STOP_METHOD_NAME);
+	public static ConfigItem MAIN_CLASS = new ConfigItem(KEY_MAIN_CLASS, false, null,INNER_PROJECT_MAIN_CLASS);
 	/**
 	 * 是否生成服务操作脚本
 	 */
@@ -55,7 +62,7 @@ public class ConfigItems {
 	/**
 	 * 服务名称,如果supportService为true,那么此项一定不能为空
 	 */
-	public static ConfigItem SERVICE_NAME = new ConfigItem(KEY_SERVICE_NAME, false, null);
+	public static ConfigItem SERVICE_NAME = new ConfigItem(KEY_SERVICE_NAME, false, null,INNER_PROJECT_NAME);
  
 	public static List<ConfigItem> getAllConfigItems(){
 		Field[]  fields=ConfigItems.class.getFields();

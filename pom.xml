@@ -10,7 +10,7 @@
 
 	<name>winpackage-maven-plugin</name>
 	<url>http://maven.apache.org</url>
-
+	<description>a tool to package windows nt service</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.version>3.3.9</maven.version>
@@ -61,6 +61,23 @@
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.9.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.hngd</groupId>
+			<artifactId>nested-jar-classloader</artifactId>
+			<version>0.2.1-SNAPSHOT</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.26</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+			<version>7.2</version>
 		</dependency>
 
 	</dependencies>

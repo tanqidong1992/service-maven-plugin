@@ -33,9 +33,9 @@ public class NtServicePackageMojo extends AbstractMojo {
 	@Parameter(required = false)
 	public File jreDirectory;
 	/**
-	 * config properties for  script generation
+	 * config properties for script generation
 	 */
-	@Parameter(required = true)
+	@Parameter(required = false)
 	public File scriptConfigFile;
 	/**
 	 * the directory to save the package file,the default value is  ${project.build.directory}/${project.artifactId}
@@ -115,7 +115,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 
 		log.info("generate scripts");
 		try {
-			ScriptGenerator.generateScripts(scriptConfigFile, outputDirectory, dependentLibDirectory, packageJarFile);
+			ScriptGenerator.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, packageJarFile);
 		} catch (ScriptGenerationException e) {
 			log.error("", e);
 			throw new MojoExecutionException("生成安装脚本错误!",e);
