@@ -1,1 +1,11 @@
-"./jre/bin/java.exe" ${javaRunOptions} -Xms${jvmMs} -Xmx${jvmMx} -classpath "${classPath}" ${mainClass}
+"./jre/bin/java.exe" ^
+<% if(has(javaRunOptions)) {%>
+${javaRunOptions} ^
+<%}%>
+<% if(has(jvmMs)) {%>
+-Xms${jvmMs} ^
+<%}%>
+<% if(has(jvmMs)) {%>
+-Xmx${jvmMx} ^
+<%}%>
+-classpath "${classPath}" ${mainClass}

@@ -9,12 +9,17 @@ prunsrv //IS//${serviceName} ^
  --StopMode=jvm ^
  --LogPath="%~dp0\logs" ^
  --LogLevel=Debug ^
+ <% if(has(jvmMs)) {%>
+  --JvmMs=${jvmMs} ^
+ <% } %>
+ <% if(has(jvmMx)) {%>
+   --JvmMx=${jvmMx} ^
+ <% } %>
  --Classpath="${classPath}" ^
  --StartClass=${mainClass} ^
  --StopClass=${mainClass} ^
  --StartMethod=${startMethod} ^
  --StopMethod=${stopMethod} ^
- --JvmMs=${jvmMs} ^
- --JvmMx=${jvmMx}
+
  
  

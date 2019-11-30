@@ -20,6 +20,8 @@ import org.beetl.core.Template;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.ClasspathResourceLoader;
 
+import com.hngd.tool.config.ConfigItem;
+import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
 
 public class ScriptGenerator {
@@ -29,19 +31,11 @@ public class ScriptGenerator {
 	public static final String START="start.bat";
 	public static final String STOP="stop.bat";
 	public static final String UNINSTALL="uninstall.bat";
-	public static final String KEY_SUPPORT_SERVICE="supportService";
-	
-	public static final String KEY_JAVA_RUN_OPTIONS="javaRunOptions";
-	public static final String KEY_JVM_MS="jvmMs";
-	public static final String KEY_JVM_MX="jvmMx";
-	public static final String DEFAULT_JVM_MS="256m";
-	public static final String DEFAULT_JVM_MX="512m";
-	public static final String KEY_SERVICE_DESCRIPTION="serviceDescription";
-	public static final String KEY_SERVICE_DISPLAY_NAME="serviceDisplayName";
-	public static final String KEY_SERVICE_NAME="serviceName";
-	private static final String SCRIPT_TEMPLATE_ROOT="/scripts";
+
 	public static final String KEY_CLASS_PATH="classPath";
-	private static final String DEFAULT_JAVA_RUN_OPTIONS = "";
+	
+	public static final String SCRIPT_TEMPLATE_ROOT="/scripts";
+	
     public static void generateScripts(File configFile,File workdir,File dependenciesDirectory,File jarFile) throws ScriptGenerationException{
     	 
     	String configPath=configFile.getAbsolutePath();
@@ -54,22 +48,10 @@ public class ScriptGenerator {
 			throw new ScriptGenerationException("模板引擎初始化失败!",e);
 		}
     	GroupTemplate groupTemplate = new GroupTemplate(resourceLoader, cfg);
-    	Map<String,Object> context=new HashMap<>();
-    	context.put(KEY_JAVA_RUN_OPTIONS, DEFAULT_JAVA_RUN_OPTIONS);
-    	context.put(KEY_JVM_MS, DEFAULT_JVM_MS);
-    	context.put(KEY_JVM_MX, DEFAULT_JVM_MX);
-    	String classpath=processClassPath(dependenciesDirectory,jarFile);
-    	context.put(KEY_CLASS_PATH, classpath);
-    	properties.forEach((k,v)->context.put((String) k, v));
-    	String serviceName=properties.getProperty(KEY_SERVICE_NAME);
-    	if(properties.getProperty(KEY_SERVICE_DISPLAY_NAME)==null){
-    		properties.setProperty(KEY_SERVICE_DISPLAY_NAME, serviceName);
-    	}
-    	if(properties.getProperty(KEY_SERVICE_DESCRIPTION)==null){
-    		properties.setProperty(KEY_SERVICE_DESCRIPTION, serviceName);
-    	}
-    	String supportService=properties.getProperty(KEY_SUPPORT_SERVICE);
-    	if("true".equals(supportService)) {
+    	
+    	
+    	Map<String,Object> context=initializeContext(properties,dependenciesDirectory,jarFile);
+    	if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
     		try {
 				generateServiceScript(workdir,groupTemplate,context);
 			} catch (BeetlException | IOException e) {
@@ -86,6 +68,19 @@ public class ScriptGenerator {
 			throw new ScriptGenerationException("文件"+runBatFile.getAbsolutePath()+"写入操作错误!",e);
 		}
     }
+
+	private static Map<String, Object> initializeContext(Properties properties, File dependenciesDirectory,File jarFile) {
+		Map<String,Object> context=new HashMap<>();
+    	String classpath=processClassPath(dependenciesDirectory,jarFile);
+    	context.put(KEY_CLASS_PATH, classpath);
+    	ConfigItems.ALL.stream()
+    	    .map(item->item.loadValue(properties))
+    	    .filter(value->value.getValue()!=null)
+    	    .forEach(value->{
+    	    	context.put(value.getName(),value.getValue());
+    	    });
+		return context;
+	}
 
 	private static void generateServiceScript(File workdir,GroupTemplate groupTemplate, Map<String, Object> context) throws BeetlException, IOException {
 		Template install = groupTemplate.getTemplate(INSTALL);
