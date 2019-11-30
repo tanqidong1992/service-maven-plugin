@@ -1,7 +1,9 @@
 prunsrv //IS//${serviceName} ^
  --Description "${serviceDescription}" ^
  --DisplayName="${serviceDisplayName}" ^
- --Startup=auto ^
+ <% if(has(startup)) {%>
+ --Startup=${startup} ^
+ <% } %>
  --Jvm=".\jre\bin\server\jvm.dll" ^
  --StartPath="%~dp0\" ^
  --StopPath="%~dp0\" ^

@@ -20,7 +20,6 @@ import org.beetl.core.Template;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.ClasspathResourceLoader;
 
-import com.hngd.tool.config.ConfigItem;
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
 
@@ -73,7 +72,7 @@ public class ScriptGenerator {
 		Map<String,Object> context=new HashMap<>();
     	String classpath=processClassPath(dependenciesDirectory,jarFile);
     	context.put(KEY_CLASS_PATH, classpath);
-    	ConfigItems.ALL.stream()
+    	ConfigItems.getAllConfigItems().stream()
     	    .map(item->item.loadValue(properties))
     	    .filter(value->value.getValue()!=null)
     	    .forEach(value->{

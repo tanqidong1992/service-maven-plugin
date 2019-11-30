@@ -1,6 +1,8 @@
 package com.hngd.tool.config;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ConfigItems {
@@ -17,6 +19,11 @@ public class ConfigItems {
 	public static final String KEY_START_METHOD = "startMethod";
 	public static final String KEY_STOP_METHOD = "stopMethod";
 	
+	public static final String KEY_STARTUP = "startup";
+	/**
+	 * 服务启动方式,默认为manual,Service startup mode can be either delayed, auto or manual
+	 */
+	public static ConfigItem STARTUP = new ConfigItem(KEY_STARTUP, false, "manual");
 	public static ConfigItem START_METHOD = new ConfigItem(KEY_START_METHOD, false, null);
 	public static ConfigItem STOP_METHOD = new ConfigItem(KEY_STOP_METHOD, false, null);
 	public static ConfigItem MAIN_CLASS = new ConfigItem(KEY_MAIN_CLASS, false, null);
@@ -49,17 +56,27 @@ public class ConfigItems {
 	 * 服务名称,如果supportService为true,那么此项一定不能为空
 	 */
 	public static ConfigItem SERVICE_NAME = new ConfigItem(KEY_SERVICE_NAME, false, null);
-
-	public static List<ConfigItem> ALL = Arrays.asList(
-			SUPPORT_SERVICE,
-			JAVA_RUN_OPTIONS,
-			JVM_MS,
-			JVM_MX,
-			SERVICE_DESCRIPTION,
-			DISPLAY_NAME,
-			SERVICE_NAME,
-			MAIN_CLASS,
-			START_METHOD,
-			STOP_METHOD
-	);
+ 
+	public static List<ConfigItem> getAllConfigItems(){
+		Field[]  fields=ConfigItems.class.getFields();
+		if(fields==null) {
+			return Collections.emptyList();
+		}
+		List<ConfigItem> all=new LinkedList<>();
+		for(Field field:fields) {
+			Class<?> type=field.getType();
+			if(!ConfigItem.class.equals(type)) {
+				continue;
+			}
+			ConfigItem ci;
+			try {
+				field.setAccessible(true);
+				ci = (ConfigItem) field.get(ConfigItems.class);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				throw new RuntimeException("", e);
+			}
+			all.add(ci);
+		}
+		return all;
+	}
 }
