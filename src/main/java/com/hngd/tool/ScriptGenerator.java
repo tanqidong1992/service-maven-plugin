@@ -24,10 +24,14 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.hngd.tool.config.ConfigItems;
+import com.hngd.tool.config.NameValuePair;
+import com.hngd.tool.constant.Constants;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.utils.ClassWeight;
 import com.hngd.tool.utils.MainClassDetector;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public class ScriptGenerator {
 
 	public static final String INSTALL="install.bat";
@@ -58,7 +62,7 @@ public class ScriptGenerator {
     	
     	Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath());
     	fixAbsentProperties(properties,mavenContext);
-    	Map<String,Object> context=initializeContext(properties,dependenciesDirectory,jarFile);
+    	Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile);
     	if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
     		try {
 				generateServiceScript(workdir,groupTemplate,context);
@@ -93,18 +97,19 @@ public class ScriptGenerator {
 			properties.put(ConfigItems.KEY_SERVICE_NAME, serviceName);
 		}
 		
-		if(!properties.containsKey(ConfigItems.KEY_SERVICE_DESCRIPTION)) {
-			if(mavenContext.containsKey(ConfigItems.INNER_PROJECT_DESCRIPTION)){
-				Object serviceDescription=mavenContext.get(ConfigItems.INNER_PROJECT_DESCRIPTION);
-				properties.put(ConfigItems.KEY_SERVICE_DESCRIPTION, serviceDescription);
-			}
+		if(!properties.containsKey(ConfigItems.KEY_SERVICE_DESCRIPTION) 
+				&& mavenContext.containsKey(ConfigItems.INNER_PROJECT_DESCRIPTION)) {
+			
+			Object serviceDescription=mavenContext.get(ConfigItems.INNER_PROJECT_DESCRIPTION);
+			properties.put(ConfigItems.KEY_SERVICE_DESCRIPTION, serviceDescription);
+			 
 		}
 		
-		if(!properties.containsKey(ConfigItems.KEY_SUPPORT_SERVICE)) {
-			if(mavenContext.containsKey(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE)){
-				Object mainClassSupportService=mavenContext.get(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE);
-				properties.put(ConfigItems.KEY_SUPPORT_SERVICE, mainClassSupportService);
-			}
+		if(!properties.containsKey(ConfigItems.KEY_SUPPORT_SERVICE) 
+			&& mavenContext.containsKey(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE)){
+			
+			Object mainClassSupportService=mavenContext.get(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE);
+			properties.put(ConfigItems.KEY_SUPPORT_SERVICE, mainClassSupportService);
 		}
 		 
 	}
@@ -118,11 +123,14 @@ public class ScriptGenerator {
 		try {
 			optionalMainClass = MainClassDetector.findTheMostAppropriateMainClass(mainJarFilePath);
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error("",e);
 		}
 		if(optionalMainClass.isPresent()) {
-			context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS, optionalMainClass.get().name);
-			if(optionalMainClass.get().weight>=3) {
+			ClassWeight mainClass=optionalMainClass.get();
+			context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS, mainClass.name);
+			//TODO support jsvc?
+			//main onStart onStop
+			if(mainClass.weight>=3) {
 				context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE, "true");
 			}
 		}
@@ -137,16 +145,14 @@ public class ScriptGenerator {
 		return context;
 	}
 
-	private static Map<String, Object> initializeContext(Properties properties, File dependenciesDirectory,File jarFile) {
+	private static Map<String, Object> initializeConfigContext(Properties properties, File dependenciesDirectory,File jarFile) {
 		Map<String,Object> context=new HashMap<>();
     	String classpath=processClassPath(dependenciesDirectory,jarFile);
     	context.put(KEY_CLASS_PATH, classpath);
     	ConfigItems.getAllConfigItems().stream()
     	    .map(item->item.loadValue(properties))
-    	    .filter(value->value.getValue()!=null)
-    	    .forEach(value->{
-    	    	context.put(value.getName(),value.getValue());
-    	    });
+    	    .filter(NameValuePair::isValuePresent)
+    	    .forEach(nameValuePair->context.put(nameValuePair.getName(),nameValuePair.getValue()));
 		return context;
 	}
 
@@ -183,7 +189,7 @@ public class ScriptGenerator {
 	private static Properties loadConfig(String configPath) {
 		Properties properties=new Properties();
 		try(InputStream in=new FileInputStream(configPath);
-			Reader reader=new InputStreamReader(in, "utf-8");){
+			Reader reader=new InputStreamReader(in, Constants.DEFAULT_CHARSET_NAME);){
 			properties.load(reader);
 		} catch (IOException e) {
 			if(e instanceof FileNotFoundException){
@@ -195,7 +201,7 @@ public class ScriptGenerator {
 		return properties;
 	}
 
-	private static String processClassPath(File dependenciesDirectory,File jarFile) {
+	private static String processClassPath(File dependenciesDirectory,File mainJarFile) {
 		File files[] = dependenciesDirectory.listFiles();
 		StringBuilder sb=new StringBuilder();
 		if(files!=null){
@@ -204,7 +210,7 @@ public class ScriptGenerator {
 	            sb.append(relativeFilePath + ";");
 	        } 
 		}
-        sb.append(jarFile.getName());
+        sb.append(mainJarFile.getName());
 		return sb.toString();
 	}
 }

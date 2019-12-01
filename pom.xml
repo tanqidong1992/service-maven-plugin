@@ -8,7 +8,7 @@
 	<version>0.0.6-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
-	<name>winpackage-maven-plugin</name>
+	<name>service-maven-plugin</name>
 	<url>http://maven.apache.org</url>
 	<description>a tool to package windows nt service</description>
 	<properties>

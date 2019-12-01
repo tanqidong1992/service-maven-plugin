@@ -31,19 +31,19 @@ public class ConfigItem {
 	private String  refIfAbsent;
 
 	
-	public ConfigItem(String name, Boolean required, String defaultValue, String refIfAbsent) {
+	protected ConfigItem(String name, Boolean required, String defaultValue, String refIfAbsent) {
 		this.name = name;
 		this.required = required;
 		this.defaultValue = defaultValue;
 		this.refIfAbsent = refIfAbsent;
 	}
-	public ConfigItem(String name, Boolean required, String defaultValue) {
+	protected ConfigItem(String name, Boolean required, String defaultValue) {
 		this(name, required, defaultValue, null);
 	}
-	public ConfigItem() {
+	protected ConfigItem() {
 		 
 	}
-	public ConfigValue loadValue(Properties properties) {
+	public NameValuePair loadValue(Properties properties) {
 		Object value=properties.get(this.name);
 		if(value==null && this.refIfAbsent!=null) {
 			value=properties.get(this.refIfAbsent);
@@ -54,13 +54,13 @@ public class ConfigItem {
 		if(this.required && value==null) {
 			throw new ScriptGenerationException("缺少必要的配置项:"+this.name, null);
 		}
-		ConfigValue cv=new ConfigValue();
+		NameValuePair nameValuePair=new NameValuePair();
 		try {
-			BeanUtils.copyProperties(cv, this);
+			BeanUtils.copyProperties(nameValuePair, this);
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new ScriptGenerationException("读取配置项:"+this.name+"出现错误", e);
 		}
-		cv.setValue(value);
-		return cv;
+		nameValuePair.setValue(value);
+		return nameValuePair;
 	}
 }

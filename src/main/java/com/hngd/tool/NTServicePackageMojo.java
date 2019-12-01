@@ -26,7 +26,7 @@ import com.hngd.tool.utils.MavenProjectUtils;
  *
  */
 @Mojo(name = "win-package", defaultPhase = LifecyclePhase.VERIFY)
-public class NtServicePackageMojo extends AbstractMojo {
+public class NTServicePackageMojo extends AbstractMojo {
 	/**
 	 * jre directory for copy
 	 */
@@ -64,7 +64,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		log = getLog();
-		log.debug("Start to package Windows NT Service");
+		log.info("Start to package Windows NT Service");
 		String buildOutputPath = mavenProject.getBuild().getDirectory();
 		String artifactId=mavenProject.getArtifactId();
 		if(outputDirectory==null) {
@@ -93,9 +93,9 @@ public class NtServicePackageMojo extends AbstractMojo {
 			}
 		}
 		outputDirectory.mkdirs();
-		log.info("copy dependent libs");
+		log.info("Copy dependent libs");
 		File dependentLibDirectory = copyDependentLibs();
-		log.info("copy main jar file");
+		log.info("Copy main jar file");
 		File mainJarFile = new File(outputDirectory, originalTargetJarFileName);
 		try {
 			FileUtils.copyFile(new File(targetMainJarFilePath), mainJarFile);
@@ -103,7 +103,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 			log.error("", e);
 			throw new MojoExecutionException("复制目标可执行Jar失败!",e);
 		}
-		log.info("copy resources");
+		log.info("Copy resources");
 		try {
 			copyResourceDirectories();
 		} catch (IOException e) {
@@ -111,7 +111,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 			throw new MojoExecutionException("复制资源目录失败!",e);
 		}
 
-		log.info("generate scripts");
+		log.info("Generate scripts");
 		try {
 			ScriptGenerator.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile);
 		} catch (ScriptGenerationException e) {
@@ -119,7 +119,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 			throw new MojoExecutionException("生成安装脚本错误!",e);
 		}
 
-		log.info("copy jre");
+		log.info("Copy jre");
 		if (jreDirectory == null) {
 			String defaultJrePath = JreUtils.getDefaultJrePath();
 			log.info("jreDirectory is empty using default jre path:" + defaultJrePath);
