@@ -70,19 +70,17 @@ public class NtServicePackageMojo extends AbstractMojo {
 		if(outputDirectory==null) {
 			outputDirectory=new File(buildOutputPath, artifactId);
 		}
-		
-		String jarFileName = MavenProjectUtils.generateJarFileName(mavenProject);
-		String originalJarFileName = jarFileName;
-		log.debug("target jar file name is " + jarFileName);
+		String targetJarFileName = MavenProjectUtils.generateJarFileName(mavenProject);
+		String originalTargetJarFileName = targetJarFileName;
+		log.debug("target jar file name is " + targetJarFileName);
 		if (MavenProjectUtils.isSpringBootPluginExist(mavenProject)) {
 			log.info("The project is packaged as spring boot flat jar,we need to obtain the origin jar file");
-			jarFileName += ".original";
+			targetJarFileName += ".original";
 		}
-		String jarFilePath = buildOutputPath + File.separator + jarFileName;
-		boolean isJarFileExist = FileUtils.fileExists(jarFilePath);
-		if (!isJarFileExist) {
+		String targetMainJarFilePath = buildOutputPath + File.separator + targetJarFileName;
+		if (!FileUtils.fileExists(targetMainJarFilePath)) {
 			log.error("The target jar file is not found");
-			throw new MojoExecutionException("The target jar file["+jarFilePath+"] is not found!,"
+			throw new MojoExecutionException("The target jar file["+targetMainJarFilePath+"] is not found!,"
 					+ "You may need to execute package first!");
 		}
 		log.info("clean output directory:"+outputDirectory.getAbsolutePath());
@@ -97,10 +95,10 @@ public class NtServicePackageMojo extends AbstractMojo {
 		outputDirectory.mkdirs();
 		log.info("copy dependent libs");
 		File dependentLibDirectory = copyDependentLibs();
-		log.debug("copy package jar file");
-		File packageJarFile = new File(outputDirectory, originalJarFileName);
+		log.info("copy main jar file");
+		File mainJarFile = new File(outputDirectory, originalTargetJarFileName);
 		try {
-			FileUtils.copyFile(new File(jarFilePath), packageJarFile);
+			FileUtils.copyFile(new File(targetMainJarFilePath), mainJarFile);
 		} catch (IOException e) {
 			log.error("", e);
 			throw new MojoExecutionException("复制目标可执行Jar失败!",e);
@@ -115,7 +113,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 
 		log.info("generate scripts");
 		try {
-			ScriptGenerator.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, packageJarFile);
+			ScriptGenerator.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile);
 		} catch (ScriptGenerationException e) {
 			log.error("", e);
 			throw new MojoExecutionException("生成安装脚本错误!",e);
@@ -138,13 +136,13 @@ public class NtServicePackageMojo extends AbstractMojo {
 	}
  
 	private void copyResourceDirectories() throws IOException {
-		log.info("start to copy resources directories");
+		log.info("Start to copy resources directories");
 		if(resourceDirectories==null) {
 			return;
 		}
 		for (File file : resourceDirectories) {
 			if (!file.exists()) {
-				log.info("the resource directory[" + file.getAbsolutePath() + "] is not found,skiped it");
+				log.info("The resource directory[" + file.getAbsolutePath() + "] is not found,skiped it");
 				continue;
 			}
 			String directoryName = file.getName();
@@ -155,7 +153,7 @@ public class NtServicePackageMojo extends AbstractMojo {
 	}
 
 	private File copyDependentLibs() throws MojoExecutionException {
-		log.debug("start to copy dependent lib files");
+		log.debug("Start to copy dependent lib files");
 		File dependentLibDirectory = new File(outputDirectory, "libs");
 		dependentLibDirectory.mkdirs();
 		List<File> dependentLibFiles=MavenProjectUtils.getDependentLibFiles(mavenProject, session, projectDependenciesResolver, projects);

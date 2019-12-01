@@ -7,8 +7,9 @@ public class MainClassDetectorTest {
 
 	public static void main(String[] args) throws IOException {
 		
-		String mainJarFilePath="W:\\workspaces\\build-tools\\ntservice-demo\\target\\ntservice-demo-0.0.1-SNAPSHOT.jar.original";
+		String mainJarFilePath="W:\\workspaces\\build-tools\\ntservice-demo\\target\\ntservice-demo-0.0.1-SNAPSHOT.jar";
 		
 		Optional<ClassWeight> s=MainClassDetector.findTheMostAppropriateMainClass(mainJarFilePath);
+		System.out.println(s.get());
 	}
 }
