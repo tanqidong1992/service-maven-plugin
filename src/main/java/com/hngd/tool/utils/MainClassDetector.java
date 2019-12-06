@@ -13,27 +13,29 @@ import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hngd.tool.constant.Constants;
+
 import io.squark.nestedjarclassloader.NestedJarClassLoader;
 
 public class MainClassDetector {
 	
 	private static Logger logger=LoggerFactory.getLogger(MainClassDetector.class);
-	
+	public static final String MODULE_NAME="default";
 	public static Optional<ClassWeight> findTheMostAppropriateMainClass(String mainJarFilePath) throws IOException{
 		NestedJarClassLoader loader=new NestedJarClassLoader(MainClassDetector.class.getClassLoader(), logger);
 		File file=new File(mainJarFilePath);
 		try {
-			loader.addURLs("main",file.toURI().toURL());
+			loader.addURLs(MODULE_NAME,file.toURI().toURL());
 		} catch (IOException e) {
 			logger.error("",e);
 			return Optional.empty();
 		}
-		List<String> classNames=loader.listAllClass("main");
+		List<String> classNames=loader.listAllClass(MODULE_NAME);
 		if(classNames==null) {
 			return Optional.empty();
 		}
 		Optional<ClassWeight> optionalMaxWeightClass=classNames.stream()
-		  .map(name->loader.getClassByteCache("main", name))
+		  .map(name->loader.getClassByteCache(MODULE_NAME, name))
 		  .map(clazz->caculateWeight(clazz))
 		  .filter(w->w.weight>0)
 		  .max(Comparator.comparing(w->w.weight));
@@ -50,11 +52,11 @@ public class MainClassDetector {
 					String[] exceptions) {
 				//public static void *(String[]args)
 				if((Opcodes.ACC_STATIC&access)>0 && (Opcodes.ACC_PUBLIC&access)>0 &&"([Ljava/lang/String;)V".equals(descriptor)) {
-					if ("main".equals(name)) {
+					if (Constants.DEFAULT_MAIN_METHOD_NAME.equals(name)) {
 						classWeight.weight++;
-					} else if ("onStart".equals(name)) {
+					} else if (Constants.DEFAULT_ON_START_METHOD_NAME.equals(name)) {
 						classWeight.weight++;
-					} else if ("onStop".equals(name)) {
+					} else if (Constants.DEFAULT_ON_STOP_METHOD_NAME.equals(name)) {
 						classWeight.weight++;
 					}
 				}

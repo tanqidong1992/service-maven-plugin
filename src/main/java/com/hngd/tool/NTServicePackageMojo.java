@@ -164,7 +164,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 			try {
 				FileUtils.copyFileToDirectory(libFile, dependentLibDirectory);
 			} catch (IOException e) {
-				log.error("Copy dependent Lib file:" + libFile.getAbsolutePath() + " failed!", e);
+				log.error("Copy dependent lib file:" + libFile.getAbsolutePath() + " failed!", e);
 				throw new MojoExecutionException("Copy dependency file:" + libFile.getAbsolutePath() + " failed!", e);
 			}
 		}
