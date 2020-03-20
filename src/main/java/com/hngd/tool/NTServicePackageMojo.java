@@ -113,7 +113,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 
 		log.info("Generate scripts");
 		try {
-			ScriptGenerator.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile);
+			ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile);
 		} catch (ScriptGenerationException e) {
 			log.error("", e);
 			throw new MojoExecutionException("生成安装脚本错误!",e);
