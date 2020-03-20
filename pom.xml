@@ -5,7 +5,7 @@
 
 	<groupId>com.hngd.tool</groupId>
 	<artifactId>service-maven-plugin</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>service-maven-plugin</name>

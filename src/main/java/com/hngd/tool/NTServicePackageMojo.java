@@ -43,10 +43,10 @@ public class NTServicePackageMojo extends AbstractMojo {
 	@Parameter(required = false)
 	public File outputDirectory;
 	/**
-	 * resource directories
+	 * resources to be copied to the package base directory
 	 */
 	@Parameter
-	public List<File> resourceDirectories;
+	public List<File> resources;
 
 	@Component
 	public MavenProject mavenProject;
@@ -136,19 +136,24 @@ public class NTServicePackageMojo extends AbstractMojo {
 	}
  
 	private void copyResourceDirectories() throws IOException {
-		log.info("Start to copy resources directories");
-		if(resourceDirectories==null) {
+		log.info("Start to copy resources");
+		if(resources==null) {
 			return;
 		}
-		for (File file : resourceDirectories) {
+		for (File file : resources) {
 			if (!file.exists()) {
-				log.info("The resource directory[" + file.getAbsolutePath() + "] is not found,skiped it");
+				log.info("The resource [" + file.getAbsolutePath() + "] is not found,skiped it");
 				continue;
 			}
-			String directoryName = file.getName();
-			File dstDirectory = new File(outputDirectory, directoryName);
-			dstDirectory.mkdirs();
-			FileUtils.copyDirectoryStructureIfModified(file, dstDirectory);
+			String fileName = file.getName();
+			File dst = new File(outputDirectory, fileName);
+			if(file.isDirectory()) {
+				dst.mkdirs();
+				FileUtils.copyDirectoryStructureIfModified(file, dst);
+			}else if(file.isFile()) {
+				FileUtils.copyFile(file, dst);
+			}
+			
 		}
 	}
 

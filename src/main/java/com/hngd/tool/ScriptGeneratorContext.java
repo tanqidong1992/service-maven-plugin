@@ -21,6 +21,7 @@ import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.config.NameValuePair;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.exception.ScriptGenerationException;
+import com.hngd.tool.generator.NTServiceScriptGenerator;
 import com.hngd.tool.utils.ClassWeight;
 import com.hngd.tool.utils.MainClassDetector;
 
@@ -39,15 +40,18 @@ public class ScriptGeneratorContext {
 		if(StringUtils.isNotEmpty(configPath)) {
 			properties=loadConfig(configPath);
 		}
-    	
-    	
+		NTServiceScriptGenerator ntsg=new NTServiceScriptGenerator();
     	Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath());
     	fixAbsentProperties(properties,mavenContext);
     	Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile);
     	if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
-    		 
+    		try {
+				ntsg.generateDaemonScript(workdir, context);
+			} catch (BeetlException | IOException e) {
+				throw new ScriptGenerationException("", e);
+			}
     	}
-    	
+    	ntsg.generateConsoleScript(workdir, context);
     	 
         
     }
