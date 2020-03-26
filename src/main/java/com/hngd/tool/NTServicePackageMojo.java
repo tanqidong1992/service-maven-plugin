@@ -45,6 +45,14 @@ public class NTServicePackageMojo extends AbstractMojo {
 	@Parameter(required = false,defaultValue = "11")
 	public String targetJreVersion;
 	/**
+	 * <0|1|2> Enable compression of resources
+	 * 0: No compression
+	 * 1: Constant string sharing
+	 * 2: ZIP
+	 */
+	@Parameter(required = false,defaultValue = "2")
+	public String compressLevel;
+	/**
 	 * config properties for script generation
 	 */
 	@Parameter(required = false)
@@ -72,6 +80,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 	private List<MavenProject> projects;
 
 	Log log;
+	
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -144,7 +153,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 			log.info("start to custom java runtime image...");
 			long startTime=System.currentTimeMillis();
 			try {
-				RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion);
+				RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion,compressLevel);
 			} catch (Exception e) {
 				log.error("", e);
 				throw new MojoExecutionException("定制复制Jre失败!",e);

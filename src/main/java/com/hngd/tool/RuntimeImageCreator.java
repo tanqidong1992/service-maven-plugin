@@ -2,6 +2,7 @@ package com.hngd.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,7 +15,6 @@ import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.util.FileUtils;
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -114,7 +114,7 @@ public class RuntimeImageCreator {
 	}
 	
 
-	public static void build(File mainJar, File dependentLibDirectory, File outputJreDirectory,String targetJreVersion) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
+	public static void build(File mainJar, File dependentLibDirectory, File outputJreDirectory,String targetJreVersion,String compressLevel) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
 		if(outputJreDirectory.exists()) {
 			FileUtils.deleteDirectory(outputJreDirectory);
 		}
@@ -156,7 +156,9 @@ public class RuntimeImageCreator {
 		modules.add("jdk.charsets");
 		String modulesStr=StringUtils.join(modules, ",");
 		System.out.println(modulesStr);
-		ProcessResult result = new ProcessExecutor().command("jlink","--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr)
+		List<String> cmds=Arrays.asList("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr);
+		log.info("custom java runtime image cmd:{}",StringUtils.join(cmds, " "));
+		ProcessResult result = new ProcessExecutor().command("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr)
                 .readOutput(true)
                 .execute();
 		int exitValue=result.getExitValue();

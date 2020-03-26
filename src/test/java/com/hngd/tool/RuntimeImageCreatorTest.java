@@ -12,6 +12,6 @@ public class RuntimeImageCreatorTest {
 		File dependentLibDirectory=new File("W:\\company\\wmp-proxy\\hnoss-mini-helper\\target\\hnoss-mini-helper\\libs");
 		 
 		File mainJar=new File("W:\\company\\wmp-proxy\\hnoss-mini-helper\\target\\hnoss-mini-helper\\hnoss-mini-helper-0.1.0.jar");
-		RuntimeImageCreator.build(mainJar, dependentLibDirectory, new File("./jre"), "11");
+		RuntimeImageCreator.build(mainJar, dependentLibDirectory, new File("./jre"), "11","0");
 	}
 }
