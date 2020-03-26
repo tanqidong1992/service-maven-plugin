@@ -3,6 +3,7 @@ package com.hngd.tool;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -16,6 +17,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
+import org.zeroturnaround.exec.InvalidExitValueException;
 
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.utils.JreUtils;
@@ -32,6 +34,16 @@ public class NTServicePackageMojo extends AbstractMojo {
 	 */
 	@Parameter(required = false)
 	public File jreDirectory;
+	/**
+	 * if true and jreDirectory is null use jlink to custome the java runtime image
+	 */
+	@Parameter(required = false,defaultValue = "false")
+	public Boolean customRuntimeImage;
+	/**
+	 * if dependent libraries contains multi-release library,choose version:targetJreVersion 
+	 */
+	@Parameter(required = false,defaultValue = "11")
+	public String targetJreVersion;
 	/**
 	 * config properties for script generation
 	 */
@@ -127,12 +139,27 @@ public class NTServicePackageMojo extends AbstractMojo {
 		}
 		File outputJreDirectory = new File(outputDirectory, "jre");
 		outputJreDirectory.mkdirs();
-		try {
-			FileUtils.copyDirectoryStructureIfModified(jreDirectory, outputJreDirectory);
-		} catch (IOException e) {
-			log.error("", e);
-			throw new MojoExecutionException("复制Jre失败!",e);
+		
+		if(jreDirectory==null || customRuntimeImage) {
+			log.info("start to custom java runtime image...");
+			long startTime=System.currentTimeMillis();
+			try {
+				RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion);
+			} catch (Exception e) {
+				log.error("", e);
+				throw new MojoExecutionException("定制复制Jre失败!",e);
+			}
+			log.info("custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
+		}else {
+			try {
+				FileUtils.copyDirectoryStructureIfModified(jreDirectory, outputJreDirectory);
+			} catch (IOException e) {
+				log.error("", e);
+				throw new MojoExecutionException("复制Jre失败!",e);
+			}
 		}
+		
+		
 	}
  
 	private void copyResourceDirectories() throws IOException {
