@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.beetl.core.Configuration;
@@ -15,6 +17,7 @@ import org.beetl.core.exception.BeetlException;
 import org.beetl.core.resource.ClasspathResourceLoader;
 
 import com.hngd.tool.ScriptGeneratorContext;
+import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
 
 public class NTServiceScriptGenerator implements ScriptGenerator {
@@ -74,10 +77,36 @@ public class NTServiceScriptGenerator implements ScriptGenerator {
 		Template run=groupTemplate.getTemplate(RUN);
     	run.binding(context);
     	File runBatFile=new File(workdir,RUN);
+    	String script=run.render();
     	try {
-			Files.write(runBatFile.toPath(), run.render().getBytes(), StandardOpenOption.CREATE);
+			Files.write(runBatFile.toPath(), script.getBytes(), StandardOpenOption.CREATE);
 		} catch (BeetlException | IOException e) {
 			throw new ScriptGenerationException("文件"+runBatFile.getAbsolutePath()+"写入操作错误!",e);
 		}
+    	String s=(String) context.get(ConfigItems.KEY_ADDITIONAL_MAIN_CLASS);
+    	if(s==null || s.length()==0) {
+    		return ;
+    	}
+    	List<String> additionalMainClassNames=new LinkedList<>();
+    	if(s.contains(",")) {
+    		String[] mainClasses=s.split(",");
+    		for(String mainClass:mainClasses) {
+    			additionalMainClassNames.add(mainClass);
+    		}
+    	}else {
+    		additionalMainClassNames.add(s);
+    	}
+    	String mainClassName=(String) context.get(ConfigItems.KEY_MAIN_CLASS);
+    	for(String additionalMainClassName:additionalMainClassNames) {
+    		String newScript=script.replace(mainClassName, additionalMainClassName);
+    		File runBatFile1=new File(workdir,"run."+additionalMainClassName+".bat");
+        	try {
+    			Files.write(runBatFile1.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
+    		} catch (BeetlException | IOException e) {
+    			throw new ScriptGenerationException("文件"+runBatFile1.getAbsolutePath()+"写入操作错误!",e);
+    		}
+    	}
+    	
+    	
 	}
 }

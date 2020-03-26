@@ -22,7 +22,7 @@ public class ConfigItems {
 	public static final String KEY_JVM_MX = "jvmMx";
 	public static final String KEY_JAVA_RUN_OPTIONS = "javaRunOptions";
 	public static final String KEY_MAIN_CLASS = "mainClass";
-	
+	public static final String KEY_ADDITIONAL_MAIN_CLASS = "additionalMainClass";
 	public static final String KEY_START_METHOD = "startMethod";
 	public static final String KEY_STOP_METHOD = "stopMethod";
 	
@@ -34,6 +34,8 @@ public class ConfigItems {
 	public static ConfigItem START_METHOD = new ConfigItem(KEY_START_METHOD, false, Constants.DEFAULT_ON_START_METHOD_NAME);
 	public static ConfigItem STOP_METHOD = new ConfigItem(KEY_STOP_METHOD, false, Constants.DEFAULT_ON_STOP_METHOD_NAME);
 	public static ConfigItem MAIN_CLASS = new ConfigItem(KEY_MAIN_CLASS, false, null,INNER_PROJECT_MAIN_CLASS);
+	
+	public static ConfigItem ADDITIONAL_MAIN_CLASS = new ConfigItem(KEY_ADDITIONAL_MAIN_CLASS, false, null);
 	/**
 	 * 是否生成服务操作脚本
 	 */
