@@ -93,28 +93,28 @@ public class NTServicePackageMojo extends AbstractMojo {
 		}
 		String targetJarFileName = MavenProjectUtils.generateJarFileName(mavenProject);
 		String originalTargetJarFileName = targetJarFileName;
-		log.debug("target jar file name is " + targetJarFileName);
+		log.debug("Target jar file name is " + targetJarFileName);
 		if (MavenProjectUtils.isSpringBootPluginExist(mavenProject)) {
-			log.info("The project is packaged as spring boot flat jar,we need to obtain the origin jar file");
+			log.info("The project is packaged as spring boot flat jar,we need to obtain the origin jar file!");
 			targetJarFileName += ".original";
 		}
 		String targetMainJarFilePath = buildOutputPath + File.separator + targetJarFileName;
 		if (!FileUtils.fileExists(targetMainJarFilePath)) {
 			log.error("The target jar file is not found");
-			throw new MojoExecutionException("The target jar file["+targetMainJarFilePath+"] is not found!,"
-					+ "You may need to execute package first!");
+			throw new MojoExecutionException("The target jar file["+targetMainJarFilePath+"] is not found!"
+					+ "You may need to execute mvn package first!");
 		}
-		log.info("clean output directory:"+outputDirectory.getAbsolutePath());
+		log.info("Clean output directory:"+outputDirectory.getAbsolutePath());
 		if (outputDirectory.exists()) {
 			try {
 				FileUtils.deleteDirectory(outputDirectory);
 			} catch (IOException e) {
 				log.error("",e);
-				throw new MojoExecutionException("clean the outputDirectory["+outputDirectory.getAbsolutePath()+"] failed!", e);
+				throw new MojoExecutionException("Clean the outputDirectory["+outputDirectory.getAbsolutePath()+"] failed!", e);
 			}
 		}
 		outputDirectory.mkdirs();
-		log.info("Copy dependent libs");
+		log.info("Copy dependent libraries");
 		File dependentLibDirectory = copyDependentLibs();
 		log.info("Copy main jar file");
 		File mainJarFile = new File(outputDirectory, originalTargetJarFileName);
@@ -141,25 +141,28 @@ public class NTServicePackageMojo extends AbstractMojo {
 		}
 
 		log.info("Copy jre");
-		if (jreDirectory == null) {
-			String defaultJrePath = JreUtils.getDefaultJrePath();
-			log.info("jreDirectory is empty using default jre path:" + defaultJrePath);
-			jreDirectory = new File(defaultJrePath);
-		}
+
 		File outputJreDirectory = new File(outputDirectory, "jre");
 		outputJreDirectory.mkdirs();
 		
-		if(jreDirectory==null || customRuntimeImage) {
-			log.info("start to custom java runtime image...");
+		if(jreDirectory==null && customRuntimeImage) {
+			log.info("Start to custom java runtime image...");
 			long startTime=System.currentTimeMillis();
 			try {
 				RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion,compressLevel);
 			} catch (Exception e) {
 				log.error("", e);
-				throw new MojoExecutionException("定制复制Jre失败!",e);
+				throw new MojoExecutionException("定制Jre失败!",e);
 			}
-			log.info("custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
+			log.info("Custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
 		}else {
+			
+			if (jreDirectory == null) {
+				String defaultJrePath = JreUtils.getDefaultJrePath();
+				log.info("The config item[jreDirectory] is empty, using default jre path:" + defaultJrePath);
+				jreDirectory = new File(defaultJrePath);
+			}
+			
 			try {
 				FileUtils.copyDirectoryStructureIfModified(jreDirectory, outputJreDirectory);
 			} catch (IOException e) {
