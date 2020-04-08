@@ -13,15 +13,17 @@ import java.util.Optional;
 import java.util.Properties;
 
 import org.apache.maven.project.MavenProject;
-import org.beetl.core.GroupTemplate;
 import org.beetl.core.exception.BeetlException;
 import org.codehaus.plexus.util.StringUtils;
 
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.config.NameValuePair;
 import com.hngd.tool.constant.Constants;
+import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.generator.NTServiceScriptGenerator;
+import com.hngd.tool.generator.ScriptGenerator;
+import com.hngd.tool.generator.SystemdScriptGenerator;
 import com.hngd.tool.utils.ClassWeight;
 import com.hngd.tool.utils.MainClassDetector;
 
@@ -33,17 +35,22 @@ public class ScriptGeneratorContext {
     		File configFile,
     		File workdir,
     		File dependenciesDirectory,
-    		File jarFile) throws ScriptGenerationException{
+    		File jarFile,String serviceType) throws ScriptGenerationException{
     	 
     	String configPath=configFile!=null?configFile.getAbsolutePath():null;
 		Properties properties=new Properties();
 		if(StringUtils.isNotEmpty(configPath)) {
 			properties=loadConfig(configPath);
 		}
-		NTServiceScriptGenerator ntsg=new NTServiceScriptGenerator();
+		ScriptGenerator ntsg=null;
+		if(ServiceTypes.NT.equals(serviceType)) {
+			ntsg=new NTServiceScriptGenerator();
+		}else {
+			ntsg=new SystemdScriptGenerator();
+		}
     	Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath());
     	fixAbsentProperties(properties,mavenContext);
-    	Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile);
+    	Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
     	if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
     		try {
 				ntsg.generateDaemonScript(workdir, context);
@@ -120,9 +127,10 @@ public class ScriptGeneratorContext {
 		return context;
 	}
 
-	private static Map<String, Object> initializeConfigContext(Properties properties, File dependenciesDirectory,File jarFile) {
+	private static Map<String, Object> initializeConfigContext(Properties properties, File dependenciesDirectory,File jarFile,String serviceType) {
+		boolean isUnixStyle=ServiceTypes.SYSTEMD.equals(serviceType);
 		Map<String,Object> context=new HashMap<>();
-    	String classpath=processClassPath(dependenciesDirectory,jarFile);
+    	String classpath=processClassPath(dependenciesDirectory,jarFile,isUnixStyle);
     	context.put(Constants.KEY_CLASS_PATH, classpath);
     	ConfigItems.getAllConfigItems().stream()
     	    .map(item->item.loadValue(properties))
@@ -146,13 +154,15 @@ public class ScriptGeneratorContext {
 		return properties;
 	}
 
-	private static String processClassPath(File dependenciesDirectory,File mainJarFile) {
+	private static String processClassPath(File dependenciesDirectory,File mainJarFile,boolean isUnixStyle) {
+		String delimiter=isUnixStyle?":":";";
+		String fileSeparator=isUnixStyle?"/":"\\";
 		File files[] = dependenciesDirectory.listFiles();
 		StringBuilder sb=new StringBuilder();
 		if(files!=null){
 			for (File file:files){
-	            String relativeFilePath = "."+File.separator+file.getParentFile().getName()+File.separator+file.getName();
-	            sb.append(relativeFilePath + ";");
+	            String relativeFilePath = "."+fileSeparator+file.getParentFile().getName()+fileSeparator+file.getName();
+	            sb.append(relativeFilePath + delimiter);
 	        } 
 		}
         sb.append(mainJarFile.getName());

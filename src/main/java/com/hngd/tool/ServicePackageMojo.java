@@ -17,17 +17,24 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.utils.BuildInfoUtils;
 import com.hngd.tool.utils.JreUtils;
 import com.hngd.tool.utils.MavenProjectUtils;
 
 /**
- * Window下程序执行脚本生成MOJO
+ * 程序执行脚本生成MOJO
+ * @author tqd
  *
  */
-@Mojo(name = "win-package", defaultPhase = LifecyclePhase.VERIFY)
-public class NTServicePackageMojo extends AbstractMojo {
+@Mojo(name = "service-package", defaultPhase = LifecyclePhase.VERIFY)
+public class ServicePackageMojo extends AbstractMojo {
+	/**
+	 * pakcage service type, NT or Systemd,default value is NT
+	 */
+	@Parameter(required = false,defaultValue = ServiceTypes.NT)
+	public String serviceType;
 	/**
 	 * jre directory for copy
 	 */
@@ -75,6 +82,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 	// TODO: This is internal maven, we should find a better way to do this
 	@Component
 	private ProjectDependenciesResolver projectDependenciesResolver;
+	
 	@Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
 	private List<MavenProject> projects;
 
@@ -84,7 +92,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		log = getLog();
-		log.info("Start to package Windows NT Service");
+		log.info("Start to package "+serviceType+" Service");
 		String buildOutputPath = mavenProject.getBuild().getDirectory();
 		String artifactId=mavenProject.getArtifactId();
 		if(outputDirectory==null) {
@@ -133,7 +141,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 
 		log.info("Generate scripts");
 		try {
-			ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile);
+			ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile,serviceType);
 		} catch (ScriptGenerationException e) {
 			log.error("", e);
 			throw new MojoExecutionException("生成安装脚本错误!",e);
