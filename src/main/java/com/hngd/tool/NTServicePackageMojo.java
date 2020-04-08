@@ -3,7 +3,6 @@ package com.hngd.tool;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -17,9 +16,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
-import org.zeroturnaround.exec.InvalidExitValueException;
 
 import com.hngd.tool.exception.ScriptGenerationException;
+import com.hngd.tool.utils.BuildInfoUtils;
 import com.hngd.tool.utils.JreUtils;
 import com.hngd.tool.utils.MavenProjectUtils;
 
@@ -35,7 +34,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 	@Parameter(required = false)
 	public File jreDirectory;
 	/**
-	 * if true and jreDirectory is null use jlink to custome the java runtime image
+	 * if true and jreDirectory is null, use jlink to custome the java runtime image
 	 */
 	@Parameter(required = false,defaultValue = "false")
 	public Boolean customRuntimeImage;
@@ -140,8 +139,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 			throw new MojoExecutionException("生成安装脚本错误!",e);
 		}
 
-		log.info("Copy jre");
-
+		log.info("Copy or custom java runtime image");
 		File outputJreDirectory = new File(outputDirectory, "jre");
 		outputJreDirectory.mkdirs();
 		
@@ -171,6 +169,12 @@ public class NTServicePackageMojo extends AbstractMojo {
 			}
 		}
 		
+		log.info("Start to generate build info");
+		try {
+			BuildInfoUtils.generateBuildInfo(mavenProject.getBasedir(), outputDirectory);
+		} catch (IOException e) {
+			throw new MojoExecutionException("Generate build info failed!", e);
+		}
 		
 	}
  
@@ -197,7 +201,7 @@ public class NTServicePackageMojo extends AbstractMojo {
 	}
 
 	private File copyDependentLibs() throws MojoExecutionException {
-		log.debug("Start to copy dependent lib files");
+		log.debug("Start to copy dependent library files");
 		File dependentLibDirectory = new File(outputDirectory, "libs");
 		dependentLibDirectory.mkdirs();
 		List<File> dependentLibFiles=MavenProjectUtils.getDependentLibFiles(mavenProject, session, projectDependenciesResolver, projects);
@@ -208,8 +212,8 @@ public class NTServicePackageMojo extends AbstractMojo {
 			try {
 				FileUtils.copyFileToDirectory(libFile, dependentLibDirectory);
 			} catch (IOException e) {
-				log.error("Copy dependent lib file:" + libFile.getAbsolutePath() + " failed!", e);
-				throw new MojoExecutionException("Copy dependency file:" + libFile.getAbsolutePath() + " failed!", e);
+				log.error("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);
+				throw new MojoExecutionException("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);
 			}
 		}
 		return dependentLibDirectory;

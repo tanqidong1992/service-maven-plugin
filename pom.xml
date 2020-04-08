@@ -10,12 +10,18 @@
 
 	<name>service-maven-plugin</name>
 	<url>http://maven.apache.org</url>
-	<description>a tool to package windows nt service</description>
+	<description>A tool to package windows nt service</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.version>3.3.9</maven.version>
 	</properties>
-
+	<developers>
+		<developer>
+			<name>QidongTan</name>
+			<email>QidongTan@qq.com</email>
+		</developer>
+	</developers>
+	<inceptionYear>2019</inceptionYear>
 	<dependencies>
 		<dependency>
 			<groupId>com.ibeetl</groupId>
@@ -93,6 +99,12 @@
 			<artifactId>zt-exec</artifactId>
 			<version>1.11</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit -->
+		<dependency>
+			<groupId>org.eclipse.jgit</groupId>
+			<artifactId>org.eclipse.jgit</artifactId>
+			<version>5.7.0.202003110725-r</version>
+		</dependency>
 
 	</dependencies>
 
@@ -140,6 +152,14 @@
 					<compilerVersion>1.8</compilerVersion>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-checkstyle-plugin></artifactId>
+				<version>3.1.1</version>
+			</plugin>
+			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.9.0</version>
+			</plugin>
 		</plugins>
 		<resources>
 			<resource>
@@ -151,7 +171,23 @@
 			</resource>
 		</resources>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.1.1</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>checkstyle</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
 
+	</reporting>
 	<distributionManagement>
 		<repository>
 			<id>hnlocal</id>
