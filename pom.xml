@@ -10,7 +10,7 @@
 
 	<name>service-maven-plugin</name>
 	<url>http://maven.apache.org</url>
-	<description>A tool to package windows nt service or systemd service</description>
+	<description>A tool to package the maven project as a windows nt or systemd service</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.version>3.3.9</maven.version>
