@@ -51,10 +51,10 @@ public class BuildInfoUtils {
 					    	return description.startsWith(tagName);
 					    	})
 					    .findFirst();
-					if(lastTagName.isEmpty()) {
-						lastVersion=buildId;
-					}else {
+					if(lastTagName.isPresent()) {
 						lastVersion=lastTagName.get();
+					}else {
+						lastVersion=buildId;
 					}
 			}else {
 				lastVersion=buildId;

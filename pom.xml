@@ -168,6 +168,7 @@
 					<include>**/*.bat</include>
 					<include>**/*.sh</include>
 					<include>**/*.exe</include>
+					<include>**/*.service</include>
 				</includes>
 			</resource>
 		</resources>

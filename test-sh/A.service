@@ -1,0 +1,13 @@
+[Unit]
+Description=A sample service.
+
+[Service]
+Type=forking
+PIDFile=/a/b/c/A.pid
+ExecStart=/a/b/c/svc.sh start
+WorkingDirectory=/a/b/c
+ExecStop=/a/b/c/svc.sh stop
+TimeoutStopSec=5min
+
+[Install]
+WantedBy=multi-user.target
