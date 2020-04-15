@@ -7,7 +7,6 @@ Type=forking
 PIDFile={{AppRoot}}/{{serviceName}}.pid
 ExecStart={{AppRoot}}/svc.sh doStart
 WorkingDirectory={{AppRoot}}
-ExecStop={{AppRoot}}/svc.sh doStop
 TimeoutStopSec=5min
 
 [Install]
