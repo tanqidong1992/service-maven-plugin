@@ -5,7 +5,6 @@ import org.apache.commons.lang3.JavaVersion;
 public class JreUtils {
 
 	private static final String JAVA_HOME = "java.home";
-	private static final String JAVA_VERSION = "java.version";
 	public static String getDefaultJrePath(){
 		String defaultJrePath=System.getProperty(JAVA_HOME);
 		return defaultJrePath;

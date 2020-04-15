@@ -10,7 +10,7 @@
 - 支持生成Windows NT/Systemd服务的安装,启动,停止,卸载脚本.
 - 支持生成控制台启动脚本.
 - 支持Spring Boot项目.
-- 对于Java 11支持定制Java运行镜像.
+- 对于Java 11+支持定制Java运行镜像.
 - 支持提取Git中的版本信息.
 
 ## 使用
@@ -35,16 +35,18 @@
 
 ### 插件配置项说明
 
-- jreDirectory,可选配置项,Jre目录,配置后,插件将会复制此目录到输出目录,如果此项为空,那么插件会将执行插件的Jre复制到输出目录.
-- customRuntimeImage,可选配置项,默认为false,如果设置为true并且配置项jreDirectory未设置,那么插件将使用jdeps,jlink自定义Java运行时并输出到输出目录下的jre子目录中.
-- targetJreVersion,可选配置项,当程序依赖了多发行版的Jar时,指定处理多发行版 jar 文件时的版本,应为大于等于 9.
-- compressLevel,可选配置项,指定自定义Java运行时的压缩级别,可取值0,1,2;0: No compression,1: Constant string sharing,2: ZIP
-- scriptConfigFile,可选配置项,指定打包配置文件路径
-- outputDirectory,可选配置项,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
-- resources,可选配置项,资源目录或者文件,配置后将复制到输出目录.
-- serviceType:可选配置项,服务类型,可取值有:NT,Systemd,默认为NT;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
+- jreDirectory,Jre目录,配置后,插件将会复制此目录到输出目录,如果此项为空,那么插件会将执行插件的Jre复制到输出目录.
+- customRuntimeImage,默认为false,如果设置为true,配置项jreDirectory未设置,Java版本大于等于11,那么插件将使用jdeps,jlink自定义Java运行时并输出到输出目录下的jre子目录中.
+- targetJreVersion,当程序依赖了多发行版的Jar时,指定处理多发行版 jar 文件时的版本,应大于等于 9.
+- compressLevel,指定自定义Java运行时的压缩级别,可取值0,1,2;0: No compression,1: Constant string sharing,2: ZIP.
+- scriptConfigFile,指定打包配置文件路径.
+- outputDirectory,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
+- resources,资源目录或者文件,配置后将复制到输出目录.
+- serviceType,服务类型,可取值有:NT,Systemd,默认为NT;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
 
-### 配置文件说明
+**备注:以上所有配置项都是可选的**
+
+### 打包配置文件说明
 
 ```properties
 #服务名称,如果为空,插件会取POM文件中的${project.name}或者${project.artifactId}作为此项的值
@@ -91,7 +93,7 @@ public class EntryClass{
 ### 执行插件
 
 ```shell
-mvn clean package #service:win-package -DskipTests
+mvn clean package #-DskipTests
 ```
 
 ## 输出目录结构
@@ -99,31 +101,30 @@ mvn clean package #service:win-package -DskipTests
 ### Windows NT服务
 
 ```shell
-.
-├── config                                                                  #程序资源目录
-├── data                                                                      #程序资源目录
-├── install.bat                                                          #NT服务安装脚本
-├── jre                                                                         #Java运行时
-├── libs                                                                       #依赖的第三方库
-├── logs                                                                      #日志文件目录
-├── ntservice-demo-0.0.1-SNAPSHOT.jar    #主jar文件
-├── prunsrv.exe                                                      #Apache Commons Daemon可执行文件
-├── run.bat                                                               #控制台启动脚本
-├── start.bat                                                             #NT服务启动脚本
-├── stop.bat                                                             #NT服务停止脚本
-└── uninstall.bat                                                    #NT服务卸载脚本
+├── build-info                             #编译版本信息,只有Git版本库才会生成
+├── install.bat                            #NT服务安装脚本
+├── jre                                    #Java运行时
+├── libs                                   #依赖的第三方库
+├── logs                                   #日志文件目录
+├── ntservice-demo-0.0.1-SNAPSHOT.jar      #主jar文件
+├── prunsrv.exe                            #Apache Commons Daemon可执行文件
+├── run.bat                                #控制台启动脚本
+├── start.bat                              #NT服务启动脚本
+├── stop.bat                               #NT服务停止脚本
+└── uninstall.bat                          #NT服务卸载脚本
 ```
 
 ### Systemd服务
 
 ```shell
-├── env.sh                                                                  #服务相关变量配置脚本
+├── build-info                                #编译版本信息,只有Git版本库才会生成
+├── env.sh                                    #服务相关变量配置脚本
 ├── hello-service-0.0.1-SNAPSHOT.jar          #主jar文件
-├── jre                                                                         #Java运行时
-├── libs                                                                       #依赖的第三方库
-├── run-foreground.sh                                         #控制台启动脚本
-├── sample.service                                               #Systemd Service Unit模板文件
-└── svc.sh                                                                 #Systemd服务操作脚本
+├── jre                                       #Java运行时
+├── libs                                      #依赖的第三方库
+├── run-foreground.sh                         #控制台启动脚本
+├── sample.service                            #Systemd Service Unit模板文件
+└── svc.sh                                    #Systemd服务操作脚本
 ```
 
 ## 编译环境
@@ -131,12 +132,12 @@ mvn clean package #service:win-package -DskipTests
 1. Oracle JDK 1.8.
 2. Apache Maven 3.3.3及以上.
 
-## 编译
+## 安装发布
 
 ```shell
-mvn package //打包
-mvn install //安装
-mvn deploy //发布
+mvn package #打包
+mvn install #安装
+mvn deploy #发布
 ```
 
 ## 相关资料
