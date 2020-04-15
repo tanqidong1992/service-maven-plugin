@@ -140,6 +140,10 @@ mvn install #安装
 mvn deploy #发布
 ```
 
+## 注意事项
+
+1. 目前NT服务只能在Windows环境下生成,System服务只能在Linux环境下生成.
+
 ## 相关资料
 
 1. [Maven 插件开发](https://maven.apache.org/plugin-developers/index.html)
