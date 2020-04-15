@@ -105,6 +105,12 @@
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>5.7.0.202003110725-r</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.10</version>
+		</dependency>
 
 	</dependencies>
 

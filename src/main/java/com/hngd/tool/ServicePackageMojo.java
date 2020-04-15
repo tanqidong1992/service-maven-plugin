@@ -151,7 +151,7 @@ public class ServicePackageMojo extends AbstractMojo {
 		File outputJreDirectory = new File(outputDirectory, "jre");
 		outputJreDirectory.mkdirs();
 		
-		if(jreDirectory==null && customRuntimeImage) {
+		if(jreDirectory==null && customRuntimeImage && JreUtils.atLeastJava11()) {
 			log.info("Start to custom java runtime image...");
 			long startTime=System.currentTimeMillis();
 			try {
