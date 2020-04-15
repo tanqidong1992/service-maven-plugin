@@ -15,7 +15,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
-import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.hngd.tool.constant.ServiceTypes;

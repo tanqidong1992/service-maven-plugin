@@ -19,17 +19,17 @@
 
 ```xml
     <plugin>
-	    <groupId>com.hngd.tool</groupId>
-		<artifactId>service-maven-plugin</artifactId>
-		<version>0.1.0-SNAPSHOT</version>
-		<executions>
-		    <execution>
+        <groupId>com.hngd.tool</groupId>
+        <artifactId>service-maven-plugin</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <executions>
+            <execution>
                 <goals>
-				    <goal>service-package</goal>
-				</goals>
-				<phase>package</phase>
-		    </execution>
-	    </executions>
+                    <goal>service-package</goal>
+                </goals>
+                <phase>package</phase>
+            </execution>
+        </executions>
     </plugin>
 ```
 
