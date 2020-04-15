@@ -1,16 +1,16 @@
-# Maven服务(Windows NT/Systemd)打包插件
+# Windows NT/Systemd服务打包Maven插件
 
 ## 简述
 
-这是一个maven插件项目,主要用于生成以后台服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本.
+这是一个Maven插件项目,主要用于将Maven工程打包成一个可独立运行的Windows NT/Systemd服务.
 
 ## 主要功能
 
+- 复制工程运行所需的第三方依赖库,Java运行时到输出目录,对于Java 11+支持定制Java运行时.
 - 零配置,自动检测入口类,根据Maven工程信息生成Windows NT/Systemd服务信息.
 - 支持生成Windows NT/Systemd服务的安装,启动,停止,卸载脚本.
 - 支持生成控制台启动脚本.
 - 支持Spring Boot项目.
-- 对于Java 11+支持定制Java运行镜像.
 - 支持提取Git中的版本信息.
 
 ## 使用
@@ -24,6 +24,7 @@
         <version>0.1.0-SNAPSHOT</version>
         <executions>
             <execution>
+                <id>service-package</id>
                 <goals>
                     <goal>service-package</goal>
                 </goals>
@@ -33,9 +34,10 @@
     </plugin>
 ```
 
-### 执行插件
+### 执行
 
 ```shell
+# cd ${项目根路径}
 mvn clean package #-DskipTests
 ```
 

@@ -28,7 +28,7 @@ import com.hngd.tool.utils.MavenProjectUtils;
  * @author tqd
  *
  */
-@Mojo(name = "service-package", defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "service-package", defaultPhase = LifecyclePhase.PACKAGE)
 public class ServicePackageMojo extends AbstractMojo {
 	/**
 	 * pakcage service type, NT or Systemd,default value is NT
