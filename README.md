@@ -1,16 +1,17 @@
-# Maven Windows NT服务打包插件
+# Maven服务(Windows NT/Systemd)打包插件
 
 ## 简述
 
-这是一个maven插件项目,主要用于生成Windows下支持以服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本.
+这是一个maven插件项目,主要用于生成以后台服务形式运行java程序的脚本,包括服务安装,启动,停止,卸载的脚本.
 
 ## 主要功能
 
-- 零配置,自动检测入口类,根据Maven工程信息生成Windows NT服务信息.
-- 支持生成Windows NT服务的安装,启动,停止,卸载脚本.
+- 零配置,自动检测入口类,根据Maven工程信息生成Windows NT/Systemd服务信息.
+- 支持生成Windows NT/Systemd服务的安装,启动,停止,卸载脚本.
 - 支持生成控制台启动脚本.
 - 支持Spring Boot项目.
 - 对于Java 11支持定制Java运行镜像.
+- 支持提取Git中的版本信息.
 
 ## 使用
 
@@ -20,20 +21,13 @@
     <plugin>
 	    <groupId>com.hngd.tool</groupId>
 		<artifactId>service-maven-plugin</artifactId>
-		<version>0.0.8-SNAPSHOT</version>
+		<version>0.1.0-SNAPSHOT</version>
 		<executions>
 		    <execution>
                 <goals>
-				    <goal>win-package</goal>
+				    <goal>service-package</goal>
 				</goals>
 				<phase>package</phase>
-				<configuration>
-				    <resources>
-						<param>${basedir}/data</param>
-						<param>${basedir}/config</param>
-						<param>${basedir}/test-data</param>
-					</resources>
-				</configuration>
 		    </execution>
 	    </executions>
     </plugin>
@@ -48,29 +42,30 @@
 - scriptConfigFile,可选配置项,指定打包配置文件路径
 - outputDirectory,可选配置项,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
 - resources,可选配置项,资源目录或者文件,配置后将复制到输出目录.
+- serviceType:可选配置项,服务类型,可取值有:NT,Systemd,默认为NT;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
 
 ### 配置文件说明
 
 ```properties
-#NT服务名称,如果为空,插件会取POM文件中的${project.name}或者${project.artifactId}作为此项的值
+#服务名称,如果为空,插件会取POM文件中的${project.name}或者${project.artifactId}作为此项的值
 serviceName=demo-service        
-#NT服务显示名称,如果此项为空,,插件会取serviceName作为此项的值
+#NT服务显示名称,如果此项为空,,插件会取serviceName作为此项的值,此配置项仅对NT服务有效
 serviceDisplayName=demo-service
-#NT服务描述内容,如果为空,插件会取POM文件中的${project.description}或者serviceName作为此项的值
+#服务描述内容,如果为空,插件会取POM文件中的${project.description}或者serviceName作为此项的值
 serviceDescription=测试服务
 #Java程序启动类,如果为空,那么插件会去寻找一个合适的类作为此项的值
 mainClass=com.hngd.NtServiceMain
-#NT服务启动时，调用的Java方法,默认值为onStart
+#NT服务启动时，调用的Java方法,默认值为onStart,此配置项仅对NT服务有效
 startMethod=onStart     
-#NT服务停止时，调用的Java方法,默认值为onStop
+#NT服务停止时，调用的Java方法,默认值为onStop,此配置项仅对NT服务有效
 stopMethod=onStop
-#是否生成NT服务的安装，启动，停止，卸载脚本,默认为false,
+#是否生成服务的安装，启动，停止，卸载脚本,默认为false,
 #如果存在合适的入口类(同时存在main,onStart,onStop方法),那么此项值默认为true
 supportService=true
 #java虚拟机内存配置
 jvmMs=512m
 jvmMx=1024m
-#服务启动方式,可取值为delayed(延迟启动), auto(自动启动) or manual(手动启动),默认为manual
+#服务启动方式,可取值为delayed(延迟启动), auto(自动启动) or manual(手动启动),默认为manual,此配置项仅对NT服务有效,Systemd服务默认安装为开机自启动
 startup=auto
 #配置生成其他主入口类控制台启动脚本,生成文件名称为run.${类名}.bat
 additionalMainClass=com.hngd.Main1,com.hngd.Main2,com.hngd.Main3
@@ -101,20 +96,34 @@ mvn clean package #service:win-package -DskipTests
 
 ## 输出目录结构
 
+### Windows NT服务
+
 ```shell
 .
-├── config                              #程序资源目录
-├── data                                #程序资源目录
-├── install.bat                         #NT服务安装脚本
-├── jre                                 #Java运行时
-├── libs                                #依赖的第三方库
-├── logs                                #日志文件目录
-├── ntservice-demo-0.0.1-SNAPSHOT.jar   #主jar文件
-├── prunsrv.exe                         #Apache Commons Daemon可执行文件
-├── run.bat                             #控制台启动脚本
-├── start.bat                           #NT服务启动脚本
-├── stop.bat                            #NT服务停止脚本
-└── uninstall.bat                       #NT服务卸载脚本
+├── config                                                                  #程序资源目录
+├── data                                                                      #程序资源目录
+├── install.bat                                                          #NT服务安装脚本
+├── jre                                                                         #Java运行时
+├── libs                                                                       #依赖的第三方库
+├── logs                                                                      #日志文件目录
+├── ntservice-demo-0.0.1-SNAPSHOT.jar    #主jar文件
+├── prunsrv.exe                                                      #Apache Commons Daemon可执行文件
+├── run.bat                                                               #控制台启动脚本
+├── start.bat                                                             #NT服务启动脚本
+├── stop.bat                                                             #NT服务停止脚本
+└── uninstall.bat                                                    #NT服务卸载脚本
+```
+
+### Systemd服务
+
+```shell
+├── env.sh                                                                  #服务相关变量配置脚本
+├── hello-service-0.0.1-SNAPSHOT.jar          #主jar文件
+├── jre                                                                         #Java运行时
+├── libs                                                                       #依赖的第三方库
+├── run-foreground.sh                                         #控制台启动脚本
+├── sample.service                                               #Systemd Service Unit模板文件
+└── svc.sh                                                                 #Systemd服务操作脚本
 ```
 
 ## 编译环境
