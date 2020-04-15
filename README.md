@@ -15,7 +15,7 @@
 
 ## 使用
 
-### 插件坐标
+### 加入插件坐标
 
 ```xml
     <plugin>
@@ -33,6 +33,16 @@
     </plugin>
 ```
 
+### 执行插件
+
+```shell
+mvn clean package #-DskipTests
+```
+
+执行后,你可以在${project.build.directory}/${project.artifactId}目录下看到打包生成的脚本.
+
+## 详细配置说明
+
 ### 插件配置项说明
 
 - jreDirectory,Jre目录,配置后,插件将会复制此目录到输出目录,如果此项为空,那么插件会将执行插件的Jre复制到输出目录.
@@ -42,7 +52,7 @@
 - scriptConfigFile,指定打包配置文件路径.
 - outputDirectory,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
 - resources,资源目录或者文件,配置后将复制到输出目录.
-- serviceType,服务类型,可取值有:NT,Systemd,默认为NT;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
+- serviceType,服务类型,可取值有:NT,Systemd,在Windows环境下默认为NT,Linux环境下默认为Systemd;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
 
 **备注:以上所有配置项都是可选的**
 
@@ -90,13 +100,7 @@ public class EntryClass{
 }
 ```
 
-### 执行插件
-
-```shell
-mvn clean package #-DskipTests
-```
-
-## 输出目录结构
+## 输出目录结构说明
 
 ### Windows NT服务
 

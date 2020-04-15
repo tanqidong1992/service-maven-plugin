@@ -15,6 +15,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
+import org.codehaus.plexus.interpolation.os.OperatingSystemUtils;
 import org.codehaus.plexus.util.FileUtils;
 
 import com.hngd.tool.constant.ServiceTypes;
@@ -33,7 +34,7 @@ public class ServicePackageMojo extends AbstractMojo {
 	/**
 	 * pakcage service type, NT or Systemd,default value is NT
 	 */
-	@Parameter(required = false,defaultValue = ServiceTypes.NT)
+	@Parameter(required = false)
 	public String serviceType;
 	/**
 	 * jre directory for copy
@@ -91,7 +92,17 @@ public class ServicePackageMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		
 		log = getLog();
+		if(serviceType==null) {
+			if(JreUtils.isLinux()) {
+				serviceType=ServiceTypes.SYSTEMD;
+			}else if(JreUtils.isWindows()){
+				serviceType=ServiceTypes.NT;
+			}
+		}else {
+			throw new MojoExecutionException("The parameter[serviceType] is empty!");
+		}
 		log.info("Start to package "+serviceType+" Service");
 		String buildOutputPath = mavenProject.getBuild().getDirectory();
 		String artifactId=mavenProject.getArtifactId();
