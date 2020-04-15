@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BuildInfoUtils {
 
+	public static final String DEFAULT_VERSION="0.0.1";
 	public static void generateBuildInfo(File projectBaseDir,File output) throws IOException {
 		
 		File gitDir=new File(projectBaseDir,".git");
@@ -33,7 +34,7 @@ public class BuildInfoUtils {
 				.build();
 		 
 		Git git=Git.wrap(repository);
-		String buildId="0.0.1";
+		String buildId=DEFAULT_VERSION;
 		try {
 			buildId=git.describe().call();
 		} catch (GitAPIException e) {
@@ -47,9 +48,7 @@ public class BuildInfoUtils {
 			if(!CollectionUtils.isEmpty(tags)) {
 				Optional<String> lastTagName=tags.stream()
 					    .map(tag->tag.getName().replace("refs/tags/", ""))
-					    .filter(tagName->{
-					    	return description.startsWith(tagName);
-					    	})
+					    .filter(tagName->description.startsWith(tagName))
 					    .findFirst();
 					if(lastTagName.isPresent()) {
 						lastVersion=lastTagName.get();

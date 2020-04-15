@@ -21,9 +21,9 @@ import com.hngd.tool.config.NameValuePair;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
-import com.hngd.tool.generator.NTServiceScriptGenerator;
 import com.hngd.tool.generator.ScriptGenerator;
-import com.hngd.tool.generator.SystemdScriptGenerator;
+import com.hngd.tool.generator.impl.NTServiceScriptGenerator;
+import com.hngd.tool.generator.impl.SystemdScriptGenerator;
 import com.hngd.tool.utils.ClassWeight;
 import com.hngd.tool.utils.MainClassDetector;
 
@@ -33,7 +33,7 @@ public class ScriptGeneratorContext {
 
     public static void generateScripts(MavenProject mavenProject, 
     		File configFile,
-    		File workdir,
+    		File outputDir,
     		File dependenciesDirectory,
     		File jarFile,String serviceType) throws ScriptGenerationException{
     	 
@@ -53,14 +53,12 @@ public class ScriptGeneratorContext {
     	Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
     	if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
     		try {
-				ntsg.generateDaemonScript(workdir, context);
+				ntsg.generateServiceScript(outputDir, context);
 			} catch (BeetlException | IOException e) {
 				throw new ScriptGenerationException("", e);
 			}
     	}
-    	ntsg.generateConsoleScript(workdir, context);
-    	 
-        
+    	ntsg.generateConsoleScript(outputDir, context);
     }
 
 	private static void fixAbsentProperties(Properties properties, Map<String, Object> mavenContext) {
@@ -110,7 +108,6 @@ public class ScriptGeneratorContext {
 		if(optionalMainClass.isPresent()) {
 			ClassWeight mainClass=optionalMainClass.get();
 			context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS, mainClass.name);
-			//TODO support jsvc?
 			//main onStart onStop
 			if(mainClass.weight>=3) {
 				context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE, "true");

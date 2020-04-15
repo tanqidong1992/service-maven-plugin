@@ -12,7 +12,7 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 import com.hngd.tool.ScriptGeneratorContext;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.exception.ScriptGenerationException;
-import com.hngd.tool.generator.NTServiceScriptGenerator;
+import com.hngd.tool.generator.impl.NTServiceScriptGenerator;
 
 public class RunTest {
 

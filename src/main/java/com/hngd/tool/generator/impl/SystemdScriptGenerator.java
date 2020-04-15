@@ -1,4 +1,4 @@
-package com.hngd.tool.generator;
+package com.hngd.tool.generator.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 import com.hngd.tool.ScriptGeneratorContext;
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
+import com.hngd.tool.generator.ScriptGenerator;
 
 public class SystemdScriptGenerator implements ScriptGenerator {
 
@@ -38,12 +39,12 @@ public class SystemdScriptGenerator implements ScriptGenerator {
 	}
 
 	@Override
-	public void generateDaemonScript(File workdir, Map<String, Object> context)  throws BeetlException, IOException{
+	public void generateServiceScript(File outputDir, Map<String, Object> context)  throws BeetlException, IOException{
 		Template env = groupTemplate.getTemplate(ENV);
     	env.binding(context);
-		Files.write(new File(workdir,ENV).toPath(), env.render().getBytes(), StandardOpenOption.CREATE);
+		Files.write(new File(outputDir,ENV).toPath(), env.render().getBytes(), StandardOpenOption.CREATE);
 		//copy svc.sh
-        File svcFile=new File(workdir,"svc.sh");
+        File svcFile=new File(outputDir,"svc.sh");
         if(svcFile.exists()) {
         	svcFile.delete();
         }
@@ -53,7 +54,7 @@ public class SystemdScriptGenerator implements ScriptGenerator {
         	throw e;
 		}
 		//copy service unit template
-		File serviceUnitTemplateFile=new File(workdir,"sample.service");
+		File serviceUnitTemplateFile=new File(outputDir,"sample.service");
         if(serviceUnitTemplateFile.exists()) {
         	serviceUnitTemplateFile.delete();
         }
@@ -66,10 +67,10 @@ public class SystemdScriptGenerator implements ScriptGenerator {
 	}
 
 	@Override
-	public void generateConsoleScript(File workdir, Map<String, Object> context) {
+	public void generateConsoleScript(File outputDir, Map<String, Object> context) {
 		Template run=groupTemplate.getTemplate(RUN);
     	run.binding(context);
-    	File runBatFile=new File(workdir,RUN);
+    	File runBatFile=new File(outputDir,RUN);
     	String script=run.render();
     	try {
 			Files.write(runBatFile.toPath(), script.getBytes(), StandardOpenOption.CREATE);
@@ -92,7 +93,7 @@ public class SystemdScriptGenerator implements ScriptGenerator {
     	String mainClassName=(String) context.get(ConfigItems.KEY_MAIN_CLASS);
     	for(String additionalMainClassName:additionalMainClassNames) {
     		String newScript=script.replace(mainClassName, additionalMainClassName);
-    		File runBatFile1=new File(workdir,"run-foreground."+additionalMainClassName+".sh");
+    		File runBatFile1=new File(outputDir,"run-foreground."+additionalMainClassName+".sh");
         	try {
     			Files.write(runBatFile1.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
     		} catch (BeetlException | IOException e) {

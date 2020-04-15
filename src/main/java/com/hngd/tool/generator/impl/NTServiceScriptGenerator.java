@@ -1,4 +1,4 @@
-package com.hngd.tool.generator;
+package com.hngd.tool.generator.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import org.beetl.core.resource.ClasspathResourceLoader;
 import com.hngd.tool.ScriptGeneratorContext;
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
+import com.hngd.tool.generator.ScriptGenerator;
 
 public class NTServiceScriptGenerator implements ScriptGenerator {
 
@@ -42,25 +43,25 @@ public class NTServiceScriptGenerator implements ScriptGenerator {
 	}
 	
 	@Override
-	public void generateDaemonScript(File workdir, Map<String, Object> context) throws BeetlException, IOException {
+	public void generateServiceScript(File outputDir, Map<String, Object> context) throws BeetlException, IOException {
 		Template install = groupTemplate.getTemplate(INSTALL);
     	install.binding(context);
-    	Files.write(new File(workdir,INSTALL).toPath(), install.render().getBytes(), StandardOpenOption.CREATE);
+    	Files.write(new File(outputDir,INSTALL).toPath(), install.render().getBytes(), StandardOpenOption.CREATE);
     	 
     	Template start=groupTemplate.getTemplate(START);
     	start.binding(context);
-        Files.write(new File(workdir,START).toPath(), start.render().getBytes(), StandardOpenOption.CREATE);
+        Files.write(new File(outputDir,START).toPath(), start.render().getBytes(), StandardOpenOption.CREATE);
         
         Template stop=groupTemplate.getTemplate(STOP);
         stop.binding(context);
-        Files.write(new File(workdir,STOP).toPath(), stop.render().getBytes(), StandardOpenOption.CREATE);
+        Files.write(new File(outputDir,STOP).toPath(), stop.render().getBytes(), StandardOpenOption.CREATE);
         
         Template uninstall=groupTemplate.getTemplate(UNINSTALL);
         uninstall.binding(context);
-        Files.write(new File(workdir,UNINSTALL).toPath(), uninstall.render().getBytes(), StandardOpenOption.CREATE);
+        Files.write(new File(outputDir,UNINSTALL).toPath(), uninstall.render().getBytes(), StandardOpenOption.CREATE);
 	    
         //copy prunsrv.exe
-        File file=new File(workdir,"prunsrv.exe");
+        File file=new File(outputDir,"prunsrv.exe");
         if(file.exists()) {
         	file.delete();
         }
@@ -73,10 +74,10 @@ public class NTServiceScriptGenerator implements ScriptGenerator {
 	}
 
 	@Override
-	public void generateConsoleScript(File workdir, Map<String, Object> context) {
+	public void generateConsoleScript(File outputDir, Map<String, Object> context) {
 		Template run=groupTemplate.getTemplate(RUN);
     	run.binding(context);
-    	File runBatFile=new File(workdir,RUN);
+    	File runBatFile=new File(outputDir,RUN);
     	String script=run.render();
     	try {
 			Files.write(runBatFile.toPath(), script.getBytes(), StandardOpenOption.CREATE);
@@ -99,7 +100,7 @@ public class NTServiceScriptGenerator implements ScriptGenerator {
     	String mainClassName=(String) context.get(ConfigItems.KEY_MAIN_CLASS);
     	for(String additionalMainClassName:additionalMainClassNames) {
     		String newScript=script.replace(mainClassName, additionalMainClassName);
-    		File runBatFile1=new File(workdir,"run."+additionalMainClassName+".bat");
+    		File runBatFile1=new File(outputDir,"run."+additionalMainClassName+".bat");
         	try {
     			Files.write(runBatFile1.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
     		} catch (BeetlException | IOException e) {

@@ -62,7 +62,6 @@ public class MavenProjectUtils {
 			DependencyResolutionResult resolutionResult = projectDependenciesResolver
 					.resolve(new DefaultDependencyResolutionRequest(project, session.getRepositorySession())
 					.setResolutionFilter(ignoreProjectDependenciesFilter));
-
 			List<File> files = resolutionResult.getDependencies().stream()
 					.map(Dependency::getArtifact)
 					// .filter(org.eclipse.aether.artifact.Artifact::isSnapshot)
