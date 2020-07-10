@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
@@ -17,6 +18,7 @@ import org.eclipse.jgit.lib.RepositoryBuilder;
 import com.google.common.io.Files;
 import com.hngd.tool.constant.Constants;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BuildInfoUtils {
@@ -32,42 +34,87 @@ public class BuildInfoUtils {
 		Repository repository=new  RepositoryBuilder()
 				.setGitDir(gitDir)
 				.build();
-		 
+		BuildInfo buildInfo=new BuildInfo();
+		buildInfo.setBuildTime(new Date());
 		Git git=Git.wrap(repository);
-		String buildId=DEFAULT_VERSION;
 		try {
-			buildId=git.describe().call();
+			String buildId=git.describe().call();
+			buildInfo.setSourceId(buildId);
 		} catch (GitAPIException e) {
 			log.error("",e);
 			 
 		}
-		String description=buildId;
-		String lastVersion=description;
+		List<Ref> tags=null;
 		try {
-			List<Ref> tags=git.tagList().call();
-			if(!CollectionUtils.isEmpty(tags)) {
-				Optional<String> lastTagName=tags.stream()
-					    .map(tag->tag.getName().replace("refs/tags/", ""))
-					    .filter(tagName->description.startsWith(tagName))
-					    .findFirst();
-					if(lastTagName.isPresent()) {
-						lastVersion=lastTagName.get();
-					}else {
-						lastVersion=buildId;
-					}
-			}else {
-				lastVersion=buildId;
-			}
+			tags=git.tagList().call();
 		} catch (GitAPIException e) {
 			log.error("",e);
 		}
+		if(!CollectionUtils.isEmpty(tags) && StringUtils.isNotEmpty(buildInfo.getSourceId())) {
+			String description=buildInfo.getSourceId();
+			Optional<String> lastTagName=tags.stream()
+				    .map(tag->tag.getName().replace("refs/tags/", ""))
+				    .filter(tagName->description.startsWith(tagName))
+				    .findFirst();
+				if(lastTagName.isPresent()) {
+					buildInfo.setVersion(lastTagName.get());
+				}
+		}
+		if(StringUtils.isEmpty(buildInfo.getVersion())) {
+			buildInfo.setVersion(DEFAULT_VERSION);
+		}
+		Files.write(buildInfo.toPropertiesString(), new File(output,"build-info.properties"), Constants.DEFAULT_CHARSET);
+        //TODO 下一个版本将被删除,为了版本兼容
+		Files.write(buildInfo.toSimpleString(), new File(output,"build-info"), Constants.DEFAULT_CHARSET);
+	}
+    
+	@Data
+	public static class BuildInfo{
+		private static final String LINE_DELIMITER="\r\n";
+		/**
+		 * 版本号
+		 */
+		private String version;
+		/**
+		 * 构建源码id,取自git describe
+		 */
+		private String sourceId;
+		/**
+		 * 构建时间
+		 */
+		private Date buildTime;
+ 
+		public String toSimpleString() {
+			
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS");
+			String buildTime=sdf.format(this.buildTime);
+			StringBuilder sb=new StringBuilder();
+			sb.append(version).append(LINE_DELIMITER);
+			if(sourceId!=null) {
+			    sb.append(sourceId).append(LINE_DELIMITER);
+			}else {
+				sb.append("").append(LINE_DELIMITER);
+			}
+			sb.append(buildTime);
+			return sb.toString();
+		}
 		
-		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSS");
-		String buildTime=sdf.format(new Date());
-		StringBuilder sb=new StringBuilder();
-		sb.append(lastVersion).append("\n");
-		sb.append(buildId).append("\n");
-		sb.append(buildTime);
-		Files.write(sb.toString(), new File(output,"build-info"), Constants.DEFAULT_CHARSET);
+		
+        public String toPropertiesString() {
+			
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd HH:mm:ss:SSSXXX");
+			String buildTime=sdf.format(this.buildTime);
+			StringBuilder sb=new StringBuilder();
+			sb.append("version=").append(version).append(LINE_DELIMITER);
+			if(sourceId!=null) {
+			    sb.append("sourceId=").append(sourceId).append(LINE_DELIMITER);
+			}
+			sb.append("buildTime=").append(buildTime);
+			return sb.toString();
+		}
 	}
 }
+
+
+
+

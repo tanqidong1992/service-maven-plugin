@@ -24,9 +24,7 @@ public class JGitTest {
 		 
 		File gitDir=new File("W:\\company\\hnoss\\hnoss-mini-helper");
 		BuildInfoUtils.generateBuildInfo(gitDir, gitDir);
-		
 
-		 
 	}
 
 }
