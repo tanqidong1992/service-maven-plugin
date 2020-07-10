@@ -55,13 +55,15 @@ public class MavenProjectUtils {
 				return false;
 			}
 			// we only want compile/runtime deps
-			return Artifact.SCOPE_COMPILE_PLUS_RUNTIME.contains(node.getDependency().getScope());
+			String scope=node.getDependency().getScope();
+			return Artifact.SCOPE_COMPILE_PLUS_RUNTIME.contains(scope) || Artifact.SCOPE_SYSTEM.contains(scope);
 		};
-
+		 
 		try {
 			DependencyResolutionResult resolutionResult = projectDependenciesResolver
 					.resolve(new DefaultDependencyResolutionRequest(project, session.getRepositorySession())
 					.setResolutionFilter(ignoreProjectDependenciesFilter));
+			
 			List<File> files = resolutionResult.getDependencies().stream()
 					.map(Dependency::getArtifact)
 					// .filter(org.eclipse.aether.artifact.Artifact::isSnapshot)
