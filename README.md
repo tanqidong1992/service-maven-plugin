@@ -107,7 +107,7 @@ public class EntryClass{
 ### Windows NT服务
 
 ```shell
-├── build-info                             #编译版本信息,只有Git版本库才会生成
+├── build-info.properties                  #编译版本信息,只有Git版本库才会生成
 ├── install.bat                            #NT服务安装脚本
 ├── jre                                    #Java运行时
 ├── libs                                   #依赖的第三方库
@@ -123,7 +123,7 @@ public class EntryClass{
 ### Systemd服务
 
 ```shell
-├── build-info                                #编译版本信息,只有Git版本库才会生成
+├── build-info.properties                     #编译版本信息,只有Git版本库才会生成
 ├── env.sh                                    #服务相关变量配置脚本
 ├── hello-service-0.0.1-SNAPSHOT.jar          #主jar文件
 ├── jre                                       #Java运行时
