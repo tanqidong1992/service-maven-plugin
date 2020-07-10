@@ -148,7 +148,7 @@ mvn deploy #发布
 
 ## 注意事项
 
-1. 目前NT服务只能在Windows环境下生成,System服务只能在Linux环境下生成.
+1. 目前NT服务只能在Windows环境下生成,Systemd服务只能在Linux环境下生成.
 
 ## 相关资料
 
