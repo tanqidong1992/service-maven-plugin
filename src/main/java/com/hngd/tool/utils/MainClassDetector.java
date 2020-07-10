@@ -13,29 +13,20 @@ import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hngd.classloader.ProjectClassLoader;
 import com.hngd.tool.constant.Constants;
-
-import io.squark.nestedjarclassloader.NestedJarClassLoader;
 
 public class MainClassDetector {
 	
 	private static Logger logger=LoggerFactory.getLogger(MainClassDetector.class);
-	public static final String MODULE_NAME="default";
+
 	public static Optional<ClassWeight> findTheMostAppropriateMainClass(String mainJarFilePath) throws IOException{
-		NestedJarClassLoader loader=new NestedJarClassLoader(MainClassDetector.class.getClassLoader(), logger);
+		ProjectClassLoader loader=new ProjectClassLoader(MainClassDetector.class.getClassLoader());
 		File file=new File(mainJarFilePath);
-		try {
-			loader.addURLs(MODULE_NAME,file.toURI().toURL());
-		} catch (IOException e) {
-			logger.error("",e);
-			return Optional.empty();
-		}
-		List<String> classNames=loader.listAllClass(MODULE_NAME);
-		if(classNames==null) {
-			return Optional.empty();
-		}
+		loader.addClasspath(file.getAbsolutePath());
+		List<String> classNames=loader.listAllClass();
 		Optional<ClassWeight> optionalMaxWeightClass=classNames.stream()
-		  .map(name->loader.getClassByteCache(MODULE_NAME, name))
+		  .map(name->loader.getClassByteCache(name))
 		  .map(clazz->caculateWeight(clazz))
 		  .filter(w->w.weight>0)
 		  .max(Comparator.comparing(w->w.weight));
