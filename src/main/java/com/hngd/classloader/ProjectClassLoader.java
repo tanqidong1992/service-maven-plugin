@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -30,16 +29,11 @@ public class ProjectClassLoader extends ClassLoader{
     private final Map<String, byte[]> byteCache = new HashMap<>();
     private final Map<String, Class<?>> classes = new HashMap<>();
     private static final Logger logger=LoggerFactory.getLogger(ProjectClassLoader.class);
-	/**
-	  * 类路径
-	 */
-	private List<String> classpaths;
-	
+ 
 	public ProjectClassLoader(ClassLoader parent) {
 		super(parent);
 		Thread.currentThread().setContextClassLoader(this);
 	}
-	
 	public void addClasspath(String...classpath) {
 		for(String cp:classpath) {
 			resolveClasspath(cp);
@@ -47,7 +41,6 @@ public class ProjectClassLoader extends ClassLoader{
 	}
 
 	private void resolveClasspath(String cp) {
-		
 		File file=new File(cp);
 		if(!file.exists()) {
 			logger.warn("the classpath:{} is not found",cp);
@@ -62,7 +55,6 @@ public class ProjectClassLoader extends ClassLoader{
 	}
 
 	private void doAddJar(File file) {
-		
 		JarFile jf=null;
 		try {
 			jf = new JarFile(file);
@@ -77,19 +69,20 @@ public class ProjectClassLoader extends ClassLoader{
 			if(entryName.endsWith(".class")) {
 				doAddClassFileFromJar(jf,entry);
 			}else if(entryName.endsWith(".jar")) {
-				try {
-					doAddNestedJar(jf.getInputStream(entry),entry);
-				} catch (IOException e) {
-					logger.error("",e);
-				}
+				doAddJarFromJar(jf,entry);
 			}
+		}
+	}
+
+	private void doAddJarFromJar(JarFile jf, JarEntry entry) {
+		try (InputStream jarStream=jf.getInputStream(entry)){
+			doAddNestedJar(jarStream,entry);
+		} catch (IOException e) {
+			logger.error("",e);
 		}
 		
 	}
-
 	private void doAddNestedJar(InputStream jarStream, JarEntry entry) {
- 
-		
 		try{
 			JarInputStream jin=new JarInputStream(jarStream);
 			JarEntry child=jin.getNextJarEntry();
@@ -104,8 +97,6 @@ public class ProjectClassLoader extends ClassLoader{
 		} catch (IOException e) {
 			logger.error("",e);
 		}
-		 
-		
 	}
 	
 	private void addClassIfClass(InputStream inputStream, String relativePath) throws IOException {
@@ -113,7 +104,6 @@ public class ProjectClassLoader extends ClassLoader{
             int len;
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] b = new byte[2048];
-
             while ((len = inputStream.read(b)) > 0) {
                 out.write(b, 0, len);
             }
@@ -121,8 +111,7 @@ public class ProjectClassLoader extends ClassLoader{
             byte[] classBytes = out.toByteArray();
             String className = relativePathToClassName(relativePath);
             //support Spring Boot Flat Jar
-            if(className.startsWith("BOOT-INF.classes."))
-            {
+            if(className.startsWith("BOOT-INF.classes.")){
             	className=className.replace("BOOT-INF.classes.", "");
             }
             byteCache.put(className, classBytes);
@@ -131,20 +120,8 @@ public class ProjectClassLoader extends ClassLoader{
 
 	private void doAddClassFileFromJar(JarFile jar, JarEntry entry) {
 		String entryName=entry.getName();
-		String className=relativePathToClassName(entryName);
 		try (InputStream in=jar.getInputStream(entry)){
-			byte[] buffer=new byte[1024];
-			int temp=-1;
-			ByteArrayOutputStream baos=new ByteArrayOutputStream();
-			while((temp=in.read(buffer, 0, buffer.length))>=0) {
-				baos.write(buffer, 0, temp);
-			}
-			//support Spring Boot Flat Jar
-            if(className.startsWith("BOOT-INF.classes."))
-            {
-            	className=className.replace("BOOT-INF.classes.", "");
-            }
-			this.byteCache.put(className, baos.toByteArray());
+			addClassIfClass(in, entryName);
 		} catch (IOException e) {
 			logger.error("",e);
 		}
@@ -152,13 +129,10 @@ public class ProjectClassLoader extends ClassLoader{
 
 	private void doAddDirectory(File directory) {
 		Collection<File> classFiles=FileUtils
-				.listFiles(directory, new String[] {".class"}, true);
-		classFiles.forEach(cf->{
-			this.doAddClassFile(directory,cf);
-		});
-		 
+				.listFiles(directory, new String[] {"class"}, true);
+		classFiles.forEach(cf->this.doAddClassFile(directory,cf));
 	}
-
+	
 	private void doAddClassFile(File classpath,File classFile) {
 		String className=extractClassName(classpath, classFile);
 		byte[] classByte=null;
@@ -172,8 +146,8 @@ public class ProjectClassLoader extends ClassLoader{
 	}
 	
 	public static String extractClassName(File classpath,File classFile) {
-		String fullPath=classFile.getAbsolutePath();
-		String relativePath=fullPath.replace(classpath.getAbsolutePath(), "");
+		String fullPath=classFile.toURI().toString();
+		String relativePath=fullPath.replace(classpath.toURI().toString(), "");
 		String className=relativePathToClassName(relativePath);
 		return className;
 	}
@@ -190,7 +164,7 @@ public class ProjectClassLoader extends ClassLoader{
         	try {
         		found=getParent().loadClass(name);
         	}catch(Throwable e) {
-    	        //logger.error("",e);
+    	        //Just ignore this exception
         	}
         	if (found != null) {
             	return found;
@@ -211,10 +185,8 @@ public class ProjectClassLoader extends ClassLoader{
         return getLoadedClass(className, resolve);
     }
 
-    private Class<?> getLoadedClass(String className, boolean resolve) throws ClassNotFoundException
-    {
+    private Class<?> getLoadedClass(String className, boolean resolve) throws ClassNotFoundException{
         synchronized (getClassLoadingLock(className)) {
-
             Class<?> loadedClass = findLoadedClass(className);
             if (classes.containsKey(className)) {
                 return classes.get(className);
@@ -222,7 +194,6 @@ public class ProjectClassLoader extends ClassLoader{
             if (byteCache.containsKey(className)) {
                 definePackageForClass(className);
                 byte[] classBytes = byteCache.get(className);
-
                 if (loadedClass == null) {
                     //We got here without Exception, meaning class was filtered from proxying. Load normally:
                     try {
