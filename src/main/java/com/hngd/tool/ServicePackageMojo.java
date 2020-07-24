@@ -20,6 +20,7 @@ import org.codehaus.plexus.util.FileUtils;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.utils.BuildInfoUtils;
+import com.hngd.tool.utils.CompressUtils;
 import com.hngd.tool.utils.JreUtils;
 import com.hngd.tool.utils.MavenProjectUtils;
 
@@ -193,6 +194,15 @@ public class ServicePackageMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException("Generate build info failed!", e);
 		}
+		String archiveType;
+		if(ServiceTypes.SYSTEMD.equals(serviceType)) {
+			archiveType="tar.gz";
+		}else {
+			archiveType="zip";
+		}
+		File archiveFile=new File(mavenProject.getBuild().getDirectory(),
+				mavenProject.getArtifactId()+"."+archiveType);
+		CompressUtils.compress(archiveFile, outputDirectory);
 		
 	}
  
