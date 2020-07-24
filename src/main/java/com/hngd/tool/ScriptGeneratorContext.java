@@ -154,15 +154,16 @@ public class ScriptGeneratorContext {
 	private static String processClassPath(File dependenciesDirectory,File mainJarFile,boolean isUnixStyle) {
 		String delimiter=isUnixStyle?":":";";
 		String fileSeparator=isUnixStyle?"/":"\\";
+		String prefix=isUnixStyle?"${APP_BASE_DIR}":"%APP_BASE_DIR%";
 		File files[] = dependenciesDirectory.listFiles();
 		StringBuilder sb=new StringBuilder();
 		if(files!=null){
 			for (File file:files){
-	            String relativeFilePath = "."+fileSeparator+file.getParentFile().getName()+fileSeparator+file.getName();
+	            String relativeFilePath = prefix+fileSeparator+file.getParentFile().getName()+fileSeparator+file.getName();
 	            sb.append(relativeFilePath + delimiter);
 	        } 
 		}
-        sb.append(mainJarFile.getName());
+        sb.append(prefix+fileSeparator+mainJarFile.getName());
 		return sb.toString();
 	}
 }
