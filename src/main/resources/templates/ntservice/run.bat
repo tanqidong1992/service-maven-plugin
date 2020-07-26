@@ -5,6 +5,7 @@ set DIRNAME=%~dp0
 if "%DIRNAME%" == "" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_BASE_DIR=%DIRNAME%
+set CMD_LINE_ARGS=%*
 
 "%APP_BASE_DIR%/jre/bin/java.exe" ^
 <% if(has(javaRunOptions)) {%>
@@ -16,4 +17,4 @@ ${javaRunOptions} ^
 <% if(has(jvmMs)) {%>
 -Xmx${jvmMx} ^
 <%}%>
--classpath "${classPath}" ${mainClass}
+-classpath "${classPath}" ${mainClass} %CMD_LINE_ARGS%
