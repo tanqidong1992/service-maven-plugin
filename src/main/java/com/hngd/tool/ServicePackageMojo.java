@@ -37,7 +37,7 @@ public class ServicePackageMojo extends AbstractMojo {
 	@Parameter(required = false)
 	public String serviceType;
 	/**
-	 * jre directory for copy
+	 * jre directory to copy
 	 */
 	@Parameter(required = false)
 	public File jreDirectory;
@@ -113,8 +113,13 @@ public class ServicePackageMojo extends AbstractMojo {
 		String originalTargetJarFileName = targetJarFileName;
 		log.debug("Target jar file name is " + targetJarFileName);
 		if (MavenProjectUtils.isSpringBootPluginExist(mavenProject)) {
-			log.info("The project is packaged as spring boot flat jar,we need to obtain the origin jar file!");
+			log.info("The project is packaged as spring boot fat jar,we need to obtain the origin jar file!");
 			targetJarFileName += ".original";
+			//新版本的Spring Boot Maven Plugin不会改变原始jar的文件名，而是把fat jar命名为${原始jar名称}-exec
+			String targetMainJarFilePath = buildOutputPath + File.separator + targetJarFileName;
+			if (!FileUtils.fileExists(targetMainJarFilePath)) {
+				targetJarFileName=originalTargetJarFileName;
+			}
 		}
 		String targetMainJarFilePath = buildOutputPath + File.separator + targetJarFileName;
 		if (!FileUtils.fileExists(targetMainJarFilePath)) {

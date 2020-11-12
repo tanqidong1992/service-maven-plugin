@@ -130,22 +130,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>3.2.0</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -195,7 +179,7 @@
 	<distributionManagement>
 		<repository>
 			<id>hnlocal</id>
-			<url>http://192.168.0.143:8082/nexus/content/repositories/snapshots/</url>
+			<url>http://47.115.117.222:8082/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>
 

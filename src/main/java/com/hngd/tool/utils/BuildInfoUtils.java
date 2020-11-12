@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -15,7 +16,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 
-import com.google.common.io.Files;
 import com.hngd.tool.constant.Constants;
 
 import lombok.Data;
@@ -25,7 +25,6 @@ public class BuildInfoUtils {
 
 	public static final String DEFAULT_VERSION="0.0.1";
 	public static void generateBuildInfo(File projectBaseDir,File output) throws IOException {
-		
 		File gitDir=new File(projectBaseDir,".git");
 		if(!gitDir.exists() || !gitDir.isDirectory()) {
 			log.info("The project is not a git repository");
@@ -42,7 +41,6 @@ public class BuildInfoUtils {
 			buildInfo.setSourceId(buildId);
 		} catch (GitAPIException e) {
 			log.error("",e);
-			 
 		}
 		List<Ref> tags=null;
 		try {
@@ -63,9 +61,9 @@ public class BuildInfoUtils {
 		if(StringUtils.isEmpty(buildInfo.getVersion())) {
 			buildInfo.setVersion(DEFAULT_VERSION);
 		}
-		Files.write(buildInfo.toPropertiesString(), new File(output,"build-info.properties"), Constants.DEFAULT_CHARSET);
+		FileUtils.write(new File(output,"build-info.properties"), buildInfo.toPropertiesString(), Constants.DEFAULT_CHARSET);
         //TODO 下一个版本将被删除,为了版本兼容
-		Files.write(buildInfo.toSimpleString(), new File(output,"build-info"), Constants.DEFAULT_CHARSET);
+		FileUtils.write( new File(output,"build-info"),buildInfo.toSimpleString(), Constants.DEFAULT_CHARSET);
 	}
     
 	@Data
