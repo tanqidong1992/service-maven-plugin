@@ -158,10 +158,13 @@ public class ScriptGeneratorContext {
 		File files[] = dependenciesDirectory.listFiles();
 		StringBuilder sb=new StringBuilder();
 		if(files!=null){
+			/**
 			for (File file:files){
 	            String relativeFilePath = prefix+fileSeparator+file.getParentFile().getName()+fileSeparator+file.getName();
 	            sb.append(relativeFilePath + delimiter);
-	        } 
+			}
+			*/
+			sb.append(prefix+fileSeparator+dependenciesDirectory.getName()+fileSeparator).append("*").append(delimiter);
 		}
         sb.append(prefix+fileSeparator+mainJarFile.getName());
 		return sb.toString();
