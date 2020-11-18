@@ -54,6 +54,10 @@ public class MavenProjectUtils {
 				// ignore project dependency artifacts
 				return false;
 			}
+			Boolean optional=node.getDependency().getOptional();
+			if(optional!=null && optional) {
+				return false;
+			}
 			// we only want compile/runtime deps
 			String scope=node.getDependency().getScope();
 			return Artifact.SCOPE_COMPILE_PLUS_RUNTIME.contains(scope) || Artifact.SCOPE_SYSTEM.contains(scope);
