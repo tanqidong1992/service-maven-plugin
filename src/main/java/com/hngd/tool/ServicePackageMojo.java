@@ -215,7 +215,7 @@ public class ServicePackageMojo extends AbstractMojo {
 		
 		if(outputZip) {
 			log.info("Package the output archive");
-		    CompressUtils.compress(archiveFile, outputDirectory);
+		    CompressUtils.compressWithBuffer(archiveFile, outputDirectory);
 		}
 	}
  

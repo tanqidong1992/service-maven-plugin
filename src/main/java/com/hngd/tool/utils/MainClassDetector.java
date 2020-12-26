@@ -26,6 +26,7 @@ public class MainClassDetector {
 		loader.addClasspath(file.getAbsolutePath());
 		List<String> classNames=loader.listAllClass();
 		Optional<ClassWeight> optionalMaxWeightClass=classNames.stream()
+		  .parallel()
 		  .map(name->loader.getClassByteCache(name))
 		  .map(clazz->caculateWeight(clazz))
 		  .filter(w->w.weight>0)

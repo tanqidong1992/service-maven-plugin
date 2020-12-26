@@ -1,5 +1,7 @@
 package com.hngd.tool.utils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,6 +29,50 @@ public class CompressUtils {
 		String relativePath=f.getAbsolutePath().replace(rootPath, "");
 		return relativePath;
 	}
+	public static void compressWithBuffer(File target, File... filesToArchive) {
+        Map<String,File> files=new HashMap<>();
+        for(File root:filesToArchive) {
+        	if(root.isFile()) {
+        		files.put(root.getName(), root);
+        	}else {
+        		Collection<File> children = 
+        				FileUtils.listFilesAndDirs(root, TrueFileFilter.TRUE,
+        				TrueFileFilter.TRUE);
+        		for(File child:children) {
+        			String relativePath=entryName(root,child);
+        			files.put(relativePath, child);
+        		}
+        		
+        	}
+        }
+		try (ArchiveOutputStream o = createArchiveBufferedOutputStream(target)) {
+			for (Entry<String,File> f : files.entrySet()) {
+				// maybe skip directories for formats like AR that don't store directories
+				ArchiveEntry entry = o.createArchiveEntry(f.getValue(), f.getKey());
+				// potentially add more flags to entry
+				o.putArchiveEntry(entry);
+				if (f.getValue().isFile()) {
+					try (InputStream i = Files.newInputStream(f.getValue().toPath())) {
+						
+						IOUtils.copy(i, o);
+					}
+				}
+				o.closeArchiveEntry();
+			}
+			o.finish();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * 
+	 * @param target
+	 * @param filesToArchive
+	 * @deprecated repalced by compressWithBuffer
+	 * @see com.hngd.tool.utils.CompressUtils.compressWithBuffer
+	 */
+	@Deprecated 
 	public static void compress(File target, File... filesToArchive) {
         Map<String,File> files=new HashMap<>();
         for(File root:filesToArchive) {
@@ -43,7 +89,7 @@ public class CompressUtils {
         		
         	}
         }
-		try (ArchiveOutputStream o = creaateArchiveOutputStream(target)) {
+		try (ArchiveOutputStream o = createArchiveOutputStream(target)) {
 			for (Entry<String,File> f : files.entrySet()) {
 				// maybe skip directories for formats like AR that don't store directories
 				ArchiveEntry entry = o.createArchiveEntry(f.getValue(), f.getKey());
@@ -62,7 +108,8 @@ public class CompressUtils {
 			e.printStackTrace();
 		}
 	}
-	private static ArchiveOutputStream creaateArchiveOutputStream(File target) throws IOException {
+	@Deprecated
+	private static ArchiveOutputStream createArchiveOutputStream(File target) throws IOException {
 		
 		String extension=FilenameUtils.getExtension(target.getName());
 		if("zip".equals(extension)) {
@@ -71,6 +118,20 @@ public class CompressUtils {
 			return new TarArchiveOutputStream(new FileOutputStream(target));
 		}else if("gz".equals(extension)) {
 			return new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(target)));
+		}else  {
+			throw new RuntimeException("Unsupported Archive File Type:"+extension);
+		} 
+	}
+	
+    private static ArchiveOutputStream createArchiveBufferedOutputStream(File target) throws IOException {
+		
+		String extension=FilenameUtils.getExtension(target.getName());
+		if("zip".equals(extension)) {
+			return new ZipArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(target)));
+		}else if("tar".equals(extension)) {
+			return new TarArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(target)));
+		}else if("gz".equals(extension)) {
+			return new TarArchiveOutputStream(new GzipCompressorOutputStream(new BufferedOutputStream(new FileOutputStream(target))));
 		}else  {
 			throw new RuntimeException("Unsupported Archive File Type:"+extension);
 		} 
