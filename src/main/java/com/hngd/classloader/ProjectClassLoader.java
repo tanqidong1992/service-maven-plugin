@@ -225,7 +225,9 @@ public class ProjectClassLoader extends ClassLoader{
         }
     }
 	public List<String> listAllClass() {
-		return byteCache.keySet().stream().collect(Collectors.toList());
+		return byteCache.keySet()
+				.stream()
+				.collect(Collectors.toList());
 	}
 	
 	public byte[] getClassByteCache(String name) {

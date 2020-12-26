@@ -17,6 +17,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
 
+import com.hngd.tool.MojoParameters.ResourceDirectoryParameter;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.utils.BuildInfoUtils;
@@ -73,7 +74,7 @@ public class ServicePackageMojo extends AbstractMojo {
 	 * resources to be copied to the package base directory
 	 */
 	@Parameter
-	public List<File> resources;
+	public List<ResourceDirectoryParameter> resources;
 
 	@Component
 	public MavenProject mavenProject;
@@ -86,7 +87,11 @@ public class ServicePackageMojo extends AbstractMojo {
 	
 	@Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
 	private List<MavenProject> projects;
-
+	/**
+	 * if true,package the output archive
+	 */
+	@Parameter(required = false,defaultValue = "false")
+	public Boolean outputZip;
 	Log log;
 	
 
@@ -145,14 +150,14 @@ public class ServicePackageMojo extends AbstractMojo {
 			FileUtils.copyFile(new File(targetMainJarFilePath), mainJarFile);
 		} catch (IOException e) {
 			log.error("", e);
-			throw new MojoExecutionException("复制目标可执行Jar失败!",e);
+			throw new MojoExecutionException("Copy java runtime failred!",e);
 		}
 		log.info("Copy resources");
 		try {
 			copyResourceDirectories();
 		} catch (IOException e) {
 			log.error("",e);
-			throw new MojoExecutionException("复制资源目录失败!",e);
+			throw new MojoExecutionException("Copy resources failed!",e);
 		}
 
 		log.info("Generate scripts");
@@ -160,7 +165,7 @@ public class ServicePackageMojo extends AbstractMojo {
 			ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile,serviceType);
 		} catch (ScriptGenerationException e) {
 			log.error("", e);
-			throw new MojoExecutionException("生成安装脚本错误!",e);
+			throw new MojoExecutionException("Generate scripts failed!",e);
 		}
 
 		log.info("Copy or custom java runtime image");
@@ -174,7 +179,7 @@ public class ServicePackageMojo extends AbstractMojo {
 				RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion,compressLevel);
 			} catch (Exception e) {
 				log.error("", e);
-				throw new MojoExecutionException("定制Jre失败!",e);
+				throw new MojoExecutionException("Custom java runtime image failed!",e);
 			}
 			log.info("Custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
 		}else {
@@ -207,8 +212,11 @@ public class ServicePackageMojo extends AbstractMojo {
 		}
 		File archiveFile=new File(mavenProject.getBuild().getDirectory(),
 				mavenProject.getArtifactId()+"."+archiveType);
-		CompressUtils.compress(archiveFile, outputDirectory);
 		
+		if(outputZip) {
+			log.info("Package the output archive");
+		    CompressUtils.compress(archiveFile, outputDirectory);
+		}
 	}
  
 	private void copyResourceDirectories() throws IOException {
@@ -216,18 +224,19 @@ public class ServicePackageMojo extends AbstractMojo {
 		if(resources==null) {
 			return;
 		}
-		for (File file : resources) {
-			if (!file.exists()) {
-				log.info("The resource [" + file.getAbsolutePath() + "] is not found,skiped it");
+		for (ResourceDirectoryParameter resource : resources) {
+			File from=resource.getFrom();
+			if (!from.exists()) {
+				log.info("The resource [" + from.getAbsolutePath() + "] is not found,skiped it");
 				continue;
 			}
-			String fileName = file.getName();
+			String fileName = resource.getInto();
 			File dst = new File(outputDirectory, fileName);
-			if(file.isDirectory()) {
+			if(from.isDirectory()) {
 				dst.mkdirs();
-				FileUtils.copyDirectoryStructureIfModified(file, dst);
-			}else if(file.isFile()) {
-				FileUtils.copyFile(file, dst);
+				FileUtils.copyDirectoryStructureIfModified(from, dst);
+			}else if(from.isFile()) {
+				FileUtils.copyFile(from, dst);
 			}
 			
 		}
