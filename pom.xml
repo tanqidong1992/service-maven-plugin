@@ -85,22 +85,22 @@
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>
-			<version>7.2</version>
+			<version>9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.zeroturnaround</groupId>
 			<artifactId>zt-exec</artifactId>
-			<version>1.11</version>
+			<version>1.12</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
-			<version>5.8.0.202006091008-r</version>
+			<version>5.10.0.202012080955-r</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.10</version>
+			<version>3.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

@@ -62,8 +62,6 @@ public class BuildInfoUtils {
 			buildInfo.setVersion(DEFAULT_VERSION);
 		}
 		FileUtils.write(new File(output,"build-info.properties"), buildInfo.toPropertiesString(), Constants.DEFAULT_CHARSET);
-        //TODO 下一个版本将被删除,为了版本兼容
-		FileUtils.write( new File(output,"build-info"),buildInfo.toSimpleString(), Constants.DEFAULT_CHARSET);
 	}
     
 	@Data
