@@ -36,13 +36,19 @@ public class RuntimeImageCreator {
 		String classpath=StringUtils.join(jarFilePaths, ";");
 		List<String> cmds=new ArrayList<>(jdeps);
 		if(isMultiReleaseJar) {
-			cmds.addAll(Arrays.asList("--multi-release",jreVersion,"-cp",classpath,libsJars.get(0).getAbsolutePath()));
+			cmds.addAll(Arrays.asList("--multi-release",jreVersion,"-cp",classpath,mainJar.getAbsolutePath()));
 		}else {
 			cmds.addAll(Arrays.asList("-cp",classpath,mainJar.getAbsolutePath()));
 		}
 		ProcessResult pr=executeCmd(cmds);
 		String output=pr.outputString(charsetName);
-		return resolveModules(output);
+		log.debug("resolveJdkInternals cmd:{},result:{}",StringUtils.join(cmds, " "),output);
+		if(pr.getExitValue()!=0) {
+			return Collections.emptyList();
+	    }else{
+	        return resolveModules(output);
+	    }
+		
 		
 	}
 	public static final List<String> jdeps=Arrays.asList("jdeps","--print-module-deps","-q");
@@ -56,7 +62,7 @@ public class RuntimeImageCreator {
 		
 	}
 	//"--multi-release","11",
-	public static List<String> resolveJdkInternals(File jarFile,String jreVersion) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException{
+	public static List<String> resolveJdkInternalsStandalong(File jarFile,String jreVersion) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException{
 		String output=null;
 		List<String> cmds=new ArrayList<>(jdeps);
 		if(isMultiReleaseJar(jarFile)) {
@@ -65,11 +71,14 @@ public class RuntimeImageCreator {
 			cmds.addAll(Arrays.asList(jarFile.getAbsolutePath()));
 		}
 		ProcessResult pr=executeCmd(cmds);
-		if(pr.getExitValue()!=0) {
-			 return Collections.emptyList();
-		 }
 		output=pr.outputString(charsetName);
-		return resolveModules(output);
+		log.debug("resolveJdkInternalsStandalong cmd:{},result:{}",StringUtils.join(cmds, " "),output);
+		if(pr.getExitValue()!=0) {
+			return Collections.emptyList();
+	    }else{
+            return resolveModules(output);
+	    }
+		
 		
 	}
 	public static List<String> resolveModules(String output){
@@ -128,14 +137,14 @@ public class RuntimeImageCreator {
 				normalJars.add(f);
 			}
 		}
-		
+		log.debug("Start analysis dependencies");
 		Set<String> modules=new HashSet<>();
 		for(File f:files) {
 			if(!f.getName().endsWith(".jar")) {
 				continue;
 			}
 			//尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
-			List<String> dependentModules=resolveJdkInternals(f, targetJreVersion);
+			List<String> dependentModules=resolveJdkInternalsStandalong(f, targetJreVersion);
 			if(dependentModules.size()>0) {
 				
 			}else if(multiReleaseJars.contains(f)) {
@@ -147,7 +156,8 @@ public class RuntimeImageCreator {
 				modules.add(module);
 			}
 		}
-		List<String> modules2=resolveJdkInternals(mainJar,normalJars,false,targetJreVersion);
+		log.debug("Start main jar dependencies");
+		List<String> modules2=resolveJdkInternals(mainJar,Arrays.asList(files),multiReleaseJars.size()>0,targetJreVersion);
 		for(String module:modules2) {
 			modules.add(module);
 		}
