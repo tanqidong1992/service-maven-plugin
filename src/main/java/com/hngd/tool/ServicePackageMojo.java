@@ -146,6 +146,7 @@ public class ServicePackageMojo extends AbstractMojo {
 		File dependentLibDirectory = copyDependentLibs();
 		log.info("Copy main jar file");
 		File mainJarFile = new File(outputDirectory, originalTargetJarFileName);
+		log.debug("Copy main jar file: "+targetMainJarFilePath+" --> "+mainJarFile.getAbsolutePath());
 		try {
 			FileUtils.copyFile(new File(targetMainJarFilePath), mainJarFile);
 		} catch (IOException e) {
@@ -238,6 +239,7 @@ public class ServicePackageMojo extends AbstractMojo {
 			}else if(from.isFile()) {
 				FileUtils.copyFile(from, dst);
 			}
+			log.debug("copy resource: "+from.getAbsolutePath()+" --> "+dst.getAbsolutePath());
 			
 		}
 	}
@@ -253,6 +255,7 @@ public class ServicePackageMojo extends AbstractMojo {
 		for (File libFile : dependentLibFiles) {
 			try {
 				FileUtils.copyFileToDirectory(libFile, dependentLibDirectory);
+				log.debug("cop dependency: "+libFile.getAbsolutePath()+" --> "+dependentLibDirectory.getAbsolutePath());
 			} catch (IOException e) {
 				log.error("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);
 				throw new MojoExecutionException("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);
