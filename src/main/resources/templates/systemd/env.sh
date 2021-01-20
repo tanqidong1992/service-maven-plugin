@@ -1,3 +1,3 @@
 #!/bin/bash
-serviceName=${serviceName}
-serviceDescription=${serviceDescription}
+serviceName="${serviceName}"
+serviceDescription="${serviceDescription}"
