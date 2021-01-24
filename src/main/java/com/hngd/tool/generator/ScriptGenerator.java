@@ -14,12 +14,12 @@ public interface ScriptGenerator {
      * @throws BeetlException
      * @throws IOException
      */
-	public void generateServiceScript(File outputDir, Map<String, Object> context) throws BeetlException, IOException;
-	/**
-	 * 生成控制台启动脚本
-	 * @param outputDir 输出目录
-	 * @param context 模板变量
-	 */
-	public void generateConsoleScript(File outputDir, Map<String, Object> context);
-	
+    public void generateServiceScript(File outputDir, Map<String, Object> context) throws BeetlException, IOException;
+    /**
+     * 生成控制台启动脚本
+     * @param outputDir 输出目录
+     * @param context 模板变量
+     */
+    public void generateConsoleScript(File outputDir, Map<String, Object> context);
+    
 }
