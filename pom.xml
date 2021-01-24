@@ -5,7 +5,7 @@
 
 	<groupId>com.hngd.tool</groupId>
 	<artifactId>service-maven-plugin</artifactId>
-	<version>0.2.0-SNAPSHOT</version>
+	<version>0.2.1-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>service-maven-plugin</name>
@@ -14,6 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.version>3.6.3</maven.version>
+		<aether-api.version>1.1.0</aether-api.version>
 	</properties>
 	<developers>
 		<developer>
@@ -125,6 +126,26 @@
 			<version>5.7.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>5.7.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>3.3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-compat</artifactId>
+			<version>3.6.3</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -164,7 +185,7 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-checkstyle-plugin></artifactId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.1.1</version>
 			</plugin>
 			<plugin>

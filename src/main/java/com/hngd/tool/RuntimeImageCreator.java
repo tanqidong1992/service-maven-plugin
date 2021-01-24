@@ -16,6 +16,9 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.hngd.tool.exception.CustomJreImageException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
@@ -25,31 +28,42 @@ import org.zeroturnaround.exec.ProcessResult;
 import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class RuntimeImageCreator {
 
-	public static final String charsetName=Charset.defaultCharset().name();
-	public static List<String> resolveJdkInternals(File mainJar,List<File> libsJars,boolean isMultiReleaseJar,String jreVersion) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException{
-		List<String> jarFilePaths=libsJars.stream()
-		    .map(f->f.getAbsolutePath())
-		    .collect(Collectors.toList());
-		String classpath=StringUtils.join(jarFilePaths, ";");
-		List<String> cmds=new ArrayList<>(jdeps);
-		if(isMultiReleaseJar) {
-			cmds.addAll(Arrays.asList("--multi-release",jreVersion,"-cp",classpath,mainJar.getAbsolutePath()));
-		}else {
-			cmds.addAll(Arrays.asList("-cp",classpath,mainJar.getAbsolutePath()));
+	public static final String charsetName = Charset.defaultCharset().name();
+
+	public static List<String> resolveJreDependencies(File mainJar, List<File> dependentJars, boolean isMultiReleaseJar,
+			String jreVersion) {
+
+		List<String> cmds = new ArrayList<>(jdeps);
+		if (isMultiReleaseJar) {
+			cmds.add("--multi-release");
+			cmds.add(jreVersion);
 		}
-		ProcessResult pr=executeCmd(cmds);
+		if (dependentJars != null && !dependentJars.isEmpty()) {
+			List<String> jarFilePaths = dependentJars.stream().map(File::getAbsolutePath).collect(Collectors.toList());
+			String classpath = StringUtils.join(jarFilePaths, ";");
+			cmds.add("-cp");
+			cmds.add(classpath);
+		}
+		cmds.add(mainJar.getAbsolutePath());
+
+		ProcessResult pr=null;
+		try {
+			pr = executeCmd(cmds);
+		} catch (InvalidExitValueException | IOException | InterruptedException | TimeoutException e) {
+			throw new CustomJreImageException("resolve Jre modules failed!",e);
+		}
 		String output=pr.outputString(charsetName);
-		log.debug("resolveJdkInternals cmd:{},result:{}",StringUtils.join(cmds, " "),output);
+		log.debug("resolveJreDependencies cmd:{},result:{}",StringUtils.join(cmds, " "),output);
 		if(pr.getExitValue()!=0) {
+			log.warn("resolveJreDependencies cmd:{},result:{}",StringUtils.join(cmds, " "),output);
 			return Collections.emptyList();
 	    }else{
 	        return resolveModules(output);
 	    }
-		
-		
 	}
 	public static final List<String> jdeps=Arrays.asList("jdeps","--print-module-deps","-q");
 	public static ProcessResult executeCmd(List<String> cmds) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
@@ -59,27 +73,10 @@ public class RuntimeImageCreator {
 				.redirectError(Slf4jStream.of(log).asDebug())
                 .execute();
 		return pr; 
-		
 	}
-	//"--multi-release","11",
-	public static List<String> resolveJdkInternalsStandalong(File jarFile,String jreVersion) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException{
-		String output=null;
-		List<String> cmds=new ArrayList<>(jdeps);
-		if(isMultiReleaseJar(jarFile)) {
-			cmds.addAll(Arrays.asList("--multi-release",jreVersion,jarFile.getAbsolutePath()));
-		}else {
-			cmds.addAll(Arrays.asList(jarFile.getAbsolutePath()));
-		}
-		ProcessResult pr=executeCmd(cmds);
-		output=pr.outputString(charsetName);
-		log.debug("resolveJdkInternalsStandalong cmd:{},result:{}",StringUtils.join(cmds, " "),output);
-		if(pr.getExitValue()!=0) {
-			return Collections.emptyList();
-	    }else{
-            return resolveModules(output);
-	    }
-		
-		
+	
+	public static List<String> resolveJreDependencies(File jarFile,String jreVersion) {
+		return resolveJreDependencies(jarFile,Collections.emptyList(),isMultiReleaseJar(jarFile),jreVersion);
 	}
 	public static List<String> resolveModules(String output){
 		List<String> modules=new LinkedList<>();
@@ -99,6 +96,11 @@ public class RuntimeImageCreator {
 		}
 		return modules;
 	}
+	/**
+	 * <a href="http://openjdk.java.net/jeps/238>JEP 238: Multi-Release JAR Files</a>
+	 * @param jar
+	 * @return
+	 */
 	public static boolean isMultiReleaseJar(File jar) {
 		try (JarFile jarFile=new JarFile(jar)){
 			Manifest manifest=jarFile.getManifest();
@@ -119,52 +121,18 @@ public class RuntimeImageCreator {
 		return false;
 	}
 	
-
 	public static void build(File mainJar, File dependentLibDirectory, File outputJreDirectory,String targetJreVersion,String compressLevel) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
 		if(outputJreDirectory.exists()) {
 			FileUtils.deleteDirectory(outputJreDirectory);
 		}
 		File[] files=dependentLibDirectory.listFiles();
-		List<File> multiReleaseJars=new LinkedList<>();
-		List<File> normalJars=new LinkedList<>();
-		for(File f:files) {
-			if(!f.getName().endsWith(".jar")) {
-				continue;
-			}
-			if(isMultiReleaseJar(f)) {
-				multiReleaseJars.add(f);
-			}else {
-				normalJars.add(f);
-			}
-		}
-		log.debug("Start analysis dependencies");
-		Set<String> modules=new HashSet<>();
-		for(File f:files) {
-			if(!f.getName().endsWith(".jar")) {
-				continue;
-			}
-			//尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
-			List<String> dependentModules=resolveJdkInternalsStandalong(f, targetJreVersion);
-			if(dependentModules.size()>0) {
-				
-			}else if(multiReleaseJars.contains(f)) {
-				dependentModules=resolveJdkInternals(f,multiReleaseJars,true,targetJreVersion);
-			}else {
-				dependentModules=resolveJdkInternals(f,normalJars,false,targetJreVersion);
-			}
-			for(String module:dependentModules) {
-				modules.add(module);
-			}
-		}
-		log.debug("Start main jar dependencies");
-		List<String> modules2=resolveJdkInternals(mainJar,Arrays.asList(files),multiReleaseJars.size()>0,targetJreVersion);
-		for(String module:modules2) {
-			modules.add(module);
-		}
-		modules.add("jdk.charsets");
-		String modulesStr=StringUtils.join(modules, ",");
+		List<File> dependentJars=Stream.of(files)
+		   .filter(f->f.getName().endsWith(".jar"))
+		   .collect(Collectors.toList());
+		Set<String> jreModules=resolveJreModules(mainJar, dependentJars, targetJreVersion);
+		String modulesStr=StringUtils.join(jreModules, ",");
 		List<String> cmds=Arrays.asList("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr);
-		log.info("custom java runtime image cmd:{}",StringUtils.join(cmds, " "));
+		log.info("Custom java runtime image cmd:{}",StringUtils.join(cmds, " "));
 		ProcessResult result = new ProcessExecutor()
 				.command("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr)
                 .redirectError(Slf4jStream.of(log).asDebug())
@@ -175,5 +143,32 @@ public class RuntimeImageCreator {
 			String s=result.outputString(charsetName);
 			throw new RuntimeException(s, null);
 		}
+	}
+
+	protected static Set<String> resolveJreModules(File mainJar,List<File> dependentJars,String targetJreVersion){
+		log.debug("Start analysis dependent jar jre modules");
+		Set<String> jreModules=new HashSet<>();
+		boolean multiReleaseJarContained=dependentJars.stream()
+			.filter(RuntimeImageCreator::isMultiReleaseJar)
+			.findFirst()
+			.isPresent();
+		dependentJars.forEach(jarFile->{
+            //尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
+			List<String> dependentJreModules=resolveJreDependencies(jarFile, targetJreVersion);
+			if(dependentJreModules.size()<=0) {
+				dependentJreModules=resolveJreDependencies(jarFile,dependentJars,multiReleaseJarContained,targetJreVersion);
+			}
+			if(dependentJreModules.size()>0) {
+				jreModules.addAll(dependentJreModules);
+			}
+		});
+		log.debug("Start analysis main jar jre modules");
+		List<String> mainJreModules=resolveJreDependencies(mainJar,dependentJars,multiReleaseJarContained,targetJreVersion);
+		for(String module:mainJreModules) {
+			jreModules.add(module);
+		}
+		//default 
+		jreModules.add("jdk.charsets");
+		return jreModules;
 	}
 }

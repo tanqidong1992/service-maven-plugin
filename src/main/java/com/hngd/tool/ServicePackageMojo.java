@@ -13,6 +13,7 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.codehaus.plexus.util.FileUtils;
@@ -143,7 +144,9 @@ public class ServicePackageMojo extends AbstractMojo {
 		}
 		outputDirectory.mkdirs();
 		log.info("Copy dependent libraries");
-		File dependentLibDirectory = copyDependentLibs();
+		DependencyResolutionResult dependencyResolutionResult=
+				MavenProjectUtils.resolveDependencies(mavenProject, session, projectDependenciesResolver, projects);
+		File dependentLibDirectory = copyDependentLibs(dependencyResolutionResult);
 		log.info("Copy main jar file");
 		File mainJarFile = new File(outputDirectory, originalTargetJarFileName);
 		log.debug("Copy main jar file: "+targetMainJarFilePath+" --> "+mainJarFile.getAbsolutePath());
@@ -244,11 +247,11 @@ public class ServicePackageMojo extends AbstractMojo {
 		}
 	}
 
-	private File copyDependentLibs() throws MojoExecutionException {
+	private File copyDependentLibs(DependencyResolutionResult dependencyResolutionResult) throws MojoExecutionException {
 		log.debug("Start to copy dependent library files");
 		File dependentLibDirectory = new File(outputDirectory, "libs");
 		dependentLibDirectory.mkdirs();
-		List<File> dependentLibFiles=MavenProjectUtils.getDependentLibFiles(mavenProject, session, projectDependenciesResolver, projects);
+		List<File> dependentLibFiles=MavenProjectUtils.toDependentLibFiles(dependencyResolutionResult);
 		if(dependentLibFiles==null) {
 			return dependentLibDirectory;
 		}

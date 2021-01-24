@@ -38,7 +38,18 @@ public class MavenProjectUtils {
 			.isPresent();
 	}
 	
-	public static List<File> getDependentLibFiles(MavenProject project, MavenSession session,
+	public static List<File> toDependentLibFiles(DependencyResolutionResult resolutionResult)
+			throws MojoExecutionException {
+	    List<File> files = resolutionResult.getDependencies().stream()
+		    .map(Dependency::getArtifact)
+			.map(org.eclipse.aether.artifact.Artifact::getFile)
+		    .collect(Collectors.toList());
+		return files;
+		
+	}
+	
+	
+	public static DependencyResolutionResult resolveDependencies(MavenProject project, MavenSession session,
 			ProjectDependenciesResolver projectDependenciesResolver, List<MavenProject> projects)
 			throws MojoExecutionException {
 		Set<String> projectArtifacts = projects.stream()
@@ -68,12 +79,7 @@ public class MavenProjectUtils {
 					.resolve(new DefaultDependencyResolutionRequest(project, session.getRepositorySession())
 					.setResolutionFilter(ignoreProjectDependenciesFilter));
 			
-			List<File> files = resolutionResult.getDependencies().stream()
-					.map(Dependency::getArtifact)
-					// .filter(org.eclipse.aether.artifact.Artifact::isSnapshot)
-					.map(org.eclipse.aether.artifact.Artifact::getFile)
-					.collect(Collectors.toList());
-			return files;
+			return resolutionResult;
 		} catch (DependencyResolutionException ex) {
 			throw new MojoExecutionException("Failed to resolve dependencies", ex);
 		}
