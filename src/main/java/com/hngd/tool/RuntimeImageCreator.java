@@ -154,14 +154,17 @@ public class RuntimeImageCreator {
             .filter(RuntimeImageCreator::isMultiReleaseJar)
             .findFirst()
             .isPresent();
-        dependentJars.forEach(jarFile->{
+        dependentJars.parallelStream().forEach(jarFile->{
             //尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
             List<String> dependentJreModules=resolveJreDependencies(jarFile, targetJreVersion);
             if(dependentJreModules.size()<=0) {
                 dependentJreModules=resolveJreDependencies(jarFile,dependentJars,multiReleaseJarContained,targetJreVersion);
             }
             if(dependentJreModules.size()>0) {
-                jreModules.addAll(dependentJreModules);
+                synchronized(jreModules){
+                    jreModules.addAll(dependentJreModules);
+                }
+                
             }
         });
         log.debug("Start analysis main jar jre modules");

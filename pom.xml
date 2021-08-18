@@ -13,8 +13,9 @@
 	<description>A tool to package the maven project as a stand-alone windows nt or systemd service</description>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.version>3.6.3</maven.version>
+		<maven.version>3.8.1</maven.version>
 		<aether-api.version>1.1.0</aether-api.version>
+		<slf4j.version>1.7.32</slf4j.version>
 	</properties>
 	<developers>
 		<developer>
@@ -27,7 +28,7 @@
 		<dependency>
 			<groupId>com.ibeetl</groupId>
 			<artifactId>beetl</artifactId>
-			<version>2.9.10</version>
+			<version>3.5.1.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -37,13 +38,13 @@
 		<dependency>
 			<groupId>org.apache.maven.plugin-tools</groupId>
 			<artifactId>maven-plugin-annotations</artifactId>
-			<version>3.6.0</version>
+			<version>3.6.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.8.6</version>
+			<version>2.8.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -53,7 +54,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.12</version>
+			<version>1.18.20</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -64,23 +65,23 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<version>2.7</version>
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.30</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.30</version>
+			<version>${slf4j.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ow2.asm</groupId>
 			<artifactId>asm</artifactId>
-			<version>9.0</version>
+			<version>9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.zeroturnaround</groupId>
@@ -90,46 +91,46 @@
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
-			<version>5.10.0.202012080955-r</version>
+			<version>5.12.0.202106070339-r</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.11</version>
+			<version>3.12.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<version>1.20</version>
+			<version>1.21</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-core</artifactId>
-			<version>1.27</version>
+			<version>1.32</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-generator-annprocess</artifactId>
-			<version>1.27</version>
+			<version>1.32</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.7.0</version>
+			<version>5.7.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.7.0</version>
+			<version>5.7.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
-			<version>5.7.0</version>
+			<version>5.7.2</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -142,7 +143,7 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-compat</artifactId>
-			<version>3.6.3</version>
+			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
 
