@@ -1,27 +1,20 @@
 # Windows NT/Systemd服务打包Maven插件
-
 ## 简述
-
 这是一个Maven插件项目,主要用于将Maven工程打包成一个可独立运行的Windows NT/Systemd服务.
-
 ## 主要功能
-
 - 复制工程运行所需的第三方依赖库,Java运行时到输出目录,对于Java 11+支持定制Java运行时.
 - 零配置,自动检测入口类,根据Maven工程信息生成Windows NT/Systemd服务信息.
 - 支持生成Windows NT/Systemd服务的安装,启动,停止,卸载脚本.
 - 支持生成控制台启动脚本.
 - 支持Spring Boot项目.
 - 支持提取Git中的版本信息.
-
 ## 使用
-
 ### 加入插件坐标
-
 ```xml
     <plugin>
         <groupId>com.hngd.tool</groupId>
         <artifactId>service-maven-plugin</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.1-SNAPSHOT</version>
         <executions>
             <execution>
                 <id>service-package</id>
@@ -33,20 +26,14 @@
         </executions>
     </plugin>
 ```
-
 ### 执行
-
 ```shell
 # cd ${项目根路径}
 mvn clean package #-DskipTests
 ```
-
 执行后,你可以在${project.build.directory}/${project.artifactId}目录下看到打包生成的脚本.
-
 ## 详细配置说明
-
 ### 插件配置项说明
-
 - jreDirectory,Jre目录,配置后,插件将会复制此目录到输出目录,如果此项为空,那么插件会将执行插件的Jre复制到输出目录.
 - customRuntimeImage,默认为false,如果设置为true,配置项jreDirectory未设置,Java版本大于等于11,那么插件将使用jdeps,jlink自定义Java运行时并输出到输出目录下的jre子目录中.
 - targetJreVersion,当程序依赖了多发行版的Jar时,指定处理多发行版 jar 文件时的版本,应大于等于 9.
@@ -55,11 +42,8 @@ mvn clean package #-DskipTests
 - outputDirectory,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
 - resources,资源目录或者文件,配置后将复制到输出目录.
 - serviceType,服务类型,可取值有:NT,Systemd,在Windows环境下默认为NT,Linux环境下默认为Systemd;NT表示打包生成Windows NT服务脚本,Systemd表示打包生成Systemd服务脚本.
-
 **备注:以上所有配置项都是可选的**
-
 ### 打包配置文件说明
-
 ```properties
 #服务名称,如果为空,插件会取POM文件中的${project.name}或者${project.artifactId}作为此项的值
 serviceName=demo-service        
@@ -85,9 +69,7 @@ startup=auto
 additionalMainClass=com.hngd.Main1,com.hngd.Main2,com.hngd.Main3
 #更多参数设置将在后续支持
 ```
-
 **配置文件不是必须的**,如果你的项目中存在一个以下形式的类,那么配置文件是可以省略的
-
 ```java
 public class EntryClass{
     public static void main(String[] args){
@@ -101,9 +83,7 @@ public class EntryClass{
     }
 }
 ```
-
 ## 输出目录结构说明
-
 ### Windows NT服务
 
 ```shell
@@ -119,9 +99,7 @@ public class EntryClass{
 ├── stop.bat                               #NT服务停止脚本
 └── uninstall.bat                          #NT服务卸载脚本
 ```
-
 ### Systemd服务
-
 ```shell
 ├── build-info.properties                     #编译版本信息,只有Git版本库才会生成
 ├── env.sh                                    #服务相关变量配置脚本
@@ -132,26 +110,18 @@ public class EntryClass{
 ├── sample.service                            #Systemd Service Unit模板文件
 └── svc.sh                                    #Systemd服务操作脚本
 ```
-
 ## 编译环境
-
 1. Oracle JDK 1.8.
 2. Apache Maven 3.3.3及以上.
-
 ## 安装发布
-
 ```shell
 mvn package #打包
 mvn install #安装
 mvn deploy #发布
 ```
-
 ## 注意事项
-
 1. 目前NT服务只能在Windows环境下生成,Systemd服务只能在Linux环境下生成.
-
 ## 相关资料
-
 1. [Maven 插件开发](https://maven.apache.org/plugin-developers/index.html)
 2. [commons-daemon]( http://commons.apache.org/proper/commons-daemon/procrun.html )
 3. [jlink]( https://docs.oracle.com/en/java/javase/14/docs/specs/man/jlink.html )

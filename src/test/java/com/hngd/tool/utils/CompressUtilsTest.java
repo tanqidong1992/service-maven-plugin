@@ -1,11 +1,9 @@
 package com.hngd.tool.utils;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -17,8 +15,7 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 public class CompressUtilsTest {
 
-	@Test
-	public void test() throws RunnerException {
+	public static void main(String []args) throws RunnerException {
 		Options opts=new OptionsBuilder()
 				.include(CompressUtilsTest.class.getSimpleName())
 				.forks(1)

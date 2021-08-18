@@ -100,14 +100,12 @@ public class NTServiceScriptGenerator implements ScriptGenerator {
         String mainClassName=(String) context.get(ConfigItems.KEY_MAIN_CLASS);
         for(String additionalMainClassName:additionalMainClassNames) {
             String newScript=script.replace(mainClassName, additionalMainClassName);
-            File runBatFile1=new File(outputDir,"run."+additionalMainClassName+".bat");
+            File additionalRunBatFile=new File(outputDir,"run."+additionalMainClassName+".bat");
             try {
-                Files.write(runBatFile1.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
+                Files.write(additionalRunBatFile.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
             } catch (BeetlException | IOException e) {
-                throw new ScriptGenerationException("文件"+runBatFile1.getAbsolutePath()+"写入操作错误!",e);
+                throw new ScriptGenerationException("文件"+additionalRunBatFile.getAbsolutePath()+"写入操作错误!",e);
             }
         }
-        
-        
     }
 }

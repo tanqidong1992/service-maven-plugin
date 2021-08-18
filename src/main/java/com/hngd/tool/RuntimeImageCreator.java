@@ -43,7 +43,9 @@ public class RuntimeImageCreator {
             cmds.add(jreVersion);
         }
         if (dependentJars != null && !dependentJars.isEmpty()) {
-            List<String> jarFilePaths = dependentJars.stream().map(File::getAbsolutePath).collect(Collectors.toList());
+            List<String> jarFilePaths = dependentJars.stream()
+                    .map(File::getAbsolutePath)
+                    .collect(Collectors.toList());
             String classpath = StringUtils.join(jarFilePaths, ";");
             cmds.add("-cp");
             cmds.add(classpath);
@@ -79,21 +81,21 @@ public class RuntimeImageCreator {
         return resolveJreDependencies(jarFile,Collections.emptyList(),isMultiReleaseJar(jarFile),jreVersion);
     }
     public static List<String> resolveModules(String output){
-        List<String> modules=new LinkedList<>();
-        if(StringUtils.isNoneBlank(output)) {
-            output=output.trim();
-            if(output.contains(",")) {
-                String[] items=output.split(",");
-                for(String item:items) {
-                    item=item.trim();
-                    if(StringUtils.isNoneBlank(item)) {
-                        modules.add(item);
-                    }
-                }
-            }else {
-                modules.add(output);
-            }
+        
+        if(StringUtils.isEmpty(output)) {
+            return Collections.emptyList();
         }
+        List<String> modules=new LinkedList<>();
+        output=output.trim();
+        if(output.contains(",")) {
+            Arrays.stream(output.split(","))
+                .map(String::trim)
+                .filter(StringUtils::isNotBlank)
+                .forEach(modules::add);
+        }else {
+            modules.add(output);
+        }
+         
         return modules;
     }
     /**
