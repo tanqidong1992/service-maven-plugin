@@ -105,3 +105,4 @@ buildNumber.properties
 .sts4-cache/ 
 
 test-output/
+.idea/
