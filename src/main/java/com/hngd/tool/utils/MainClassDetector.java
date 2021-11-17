@@ -38,7 +38,7 @@ public class MainClassDetector {
 
         ClassWeight classWeight = new ClassWeight();
         ClassReader classReader = new ClassReader(data);
-        ClassVisitor classVisitor = new ClassVisitor(Opcodes.ASM7) {
+        ClassVisitor classVisitor = new ClassVisitor(Opcodes.ASM9) {
             @Override
             public MethodVisitor visitMethod(int access, String name, String descriptor, String signature,
                     String[] exceptions) {

@@ -95,7 +95,6 @@ public class RuntimeImageCreator {
         }else {
             modules.add(output);
         }
-         
         return modules;
     }
     /**
