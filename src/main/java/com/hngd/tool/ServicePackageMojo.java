@@ -27,7 +27,7 @@ import com.hngd.tool.utils.JreUtils;
 import com.hngd.tool.utils.MavenProjectUtils;
 
 /**
- * 程序执行脚本生成MOJO
+ * Service Scripts Generator MOJO
  * @author tqd
  *
  */
@@ -44,7 +44,7 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(required = false)
     public File jreDirectory;
     /**
-     * if true and jreDirectory is null, use jlink to custome the java runtime image
+     * if true and jreDirectory is null, use jlink to custom the java runtime image
      */
     @Parameter(required = false,defaultValue = "false")
     public Boolean customRuntimeImage;
@@ -154,7 +154,7 @@ public class ServicePackageMojo extends AbstractMojo {
             FileUtils.copyFile(new File(targetMainJarFilePath), mainJarFile);
         } catch (IOException e) {
             log.error("", e);
-            throw new MojoExecutionException("Copy java runtime failred!",e);
+            throw new MojoExecutionException("Copy java runtime failed!",e);
         }
         log.info("Copy resources");
         try {
@@ -231,7 +231,7 @@ public class ServicePackageMojo extends AbstractMojo {
         for (ResourceDirectoryParameter resource : resources) {
             File from=resource.getFrom();
             if (!from.exists()) {
-                log.info("The resource [" + from.getAbsolutePath() + "] is not found,skiped it");
+                log.info("The resource [" + from.getAbsolutePath() + "] is not found,skipped it");
                 continue;
             }
             String fileName = resource.getInto();
@@ -258,7 +258,7 @@ public class ServicePackageMojo extends AbstractMojo {
         for (File libFile : dependentLibFiles) {
             try {
                 FileUtils.copyFileToDirectory(libFile, dependentLibDirectory);
-                log.debug("cop dependency: "+libFile.getAbsolutePath()+" --> "+dependentLibDirectory.getAbsolutePath());
+                log.debug("Copy dependency: "+libFile.getAbsolutePath()+" --> "+dependentLibDirectory.getAbsolutePath());
             } catch (IOException e) {
                 log.error("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);
                 throw new MojoExecutionException("Copy dependent library file:" + libFile.getAbsolutePath() + " failed!", e);

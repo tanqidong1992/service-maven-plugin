@@ -70,7 +70,6 @@ public class CompressUtils {
      * @param target
      * @param filesToArchive
      * @deprecated replaced by compressWithBuffer
-     * @see com.hngd.tool.utils.CompressUtils.compressWithBuffer
      */
     @Deprecated 
     public static void compress(File target, File... filesToArchive) {

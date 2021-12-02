@@ -93,7 +93,9 @@ public class RuntimeImageCreator {
                 .filter(StringUtils::isNotBlank)
                 .forEach(modules::add);
         }else {
-            modules.add(output);
+            if(output.length()>0) {
+                modules.add(output);
+            }
         }
         return modules;
     }
