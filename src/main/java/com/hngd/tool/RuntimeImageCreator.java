@@ -67,7 +67,7 @@ public class RuntimeImageCreator {
             return resolveModules(output);
         }
     }
-    public static final List<String> jdeps=Arrays.asList("jdeps","--print-module-deps","-q");
+    public static final List<String> jdeps=Arrays.asList("jdeps","--print-module-deps","--ignore-missing-deps","-q");
     public static ProcessResult executeCmd(List<String> cmds) throws InvalidExitValueException, IOException, InterruptedException, TimeoutException {
         ProcessResult pr= new ProcessExecutor()
             .command(cmds)
