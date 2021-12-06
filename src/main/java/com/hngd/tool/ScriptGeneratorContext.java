@@ -22,7 +22,7 @@ import com.hngd.tool.constant.Constants;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.generator.ScriptGenerator;
-import com.hngd.tool.generator.impl.NTServiceScriptGenerator;
+import com.hngd.tool.generator.impl.WindowsServiceScriptGenerator;
 import com.hngd.tool.generator.impl.SystemdScriptGenerator;
 import com.hngd.tool.utils.ClassWeight;
 import com.hngd.tool.utils.MainClassDetector;
@@ -43,8 +43,8 @@ public class ScriptGeneratorContext {
             properties=loadConfig(configPath);
         }
         ScriptGenerator ntsg=null;
-        if(ServiceTypes.NT.equals(serviceType)) {
-            ntsg=new NTServiceScriptGenerator();
+        if(ServiceTypes.WINDOWS.equals(serviceType)) {
+            ntsg=new WindowsServiceScriptGenerator();
         }else {
             ntsg=new SystemdScriptGenerator();
         }

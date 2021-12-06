@@ -21,17 +21,17 @@ import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
 import com.hngd.tool.generator.ScriptGenerator;
 
-public class NTServiceScriptGenerator implements ScriptGenerator {
+public class WindowsServiceScriptGenerator implements ScriptGenerator {
 
     public static final String INSTALL="install.bat";
     public static final String RUN="run.bat";
     public static final String START="start.bat";
     public static final String STOP="stop.bat";
     public static final String UNINSTALL="uninstall.bat";
-    public static final String SCRIPT_TEMPLATE_ROOT="/templates/ntservice";
+    public static final String SCRIPT_TEMPLATE_ROOT="/templates/windows";
     
     GroupTemplate groupTemplate;
-    public NTServiceScriptGenerator() {
+    public WindowsServiceScriptGenerator() {
         ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(SCRIPT_TEMPLATE_ROOT,"utf-8");
         Configuration cfg=null;
         try {

@@ -9,16 +9,15 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.core.resource.ClasspathResourceLoader;
 
-import com.hngd.tool.ScriptGeneratorContext;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.exception.ScriptGenerationException;
-import com.hngd.tool.generator.impl.NTServiceScriptGenerator;
+import com.hngd.tool.generator.impl.WindowsServiceScriptGenerator;
 
 public class RunTest {
 
 	public static void main(String[] args) {
 		
-		ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(NTServiceScriptGenerator.SCRIPT_TEMPLATE_ROOT,"utf-8");
+		ClasspathResourceLoader resourceLoader = new ClasspathResourceLoader(WindowsServiceScriptGenerator.SCRIPT_TEMPLATE_ROOT,"utf-8");
     	Configuration cfg=null;
 		try {
 			cfg = Configuration.defaultConfiguration();
@@ -29,7 +28,7 @@ public class RunTest {
     	Map<String,Object> context=new HashMap<>();
     	context.put(Constants.KEY_CLASS_PATH, "123");
     	context.put("mainClass", "com.tqd.A");
-    	Template tpl=groupTemplate.getTemplate(NTServiceScriptGenerator.RUN);
+    	Template tpl=groupTemplate.getTemplate(WindowsServiceScriptGenerator.RUN);
     	tpl.binding(context);
     	String s=tpl.render();
     	System.out.println(s);

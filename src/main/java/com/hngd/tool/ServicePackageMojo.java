@@ -34,22 +34,24 @@ import com.hngd.tool.utils.MavenProjectUtils;
 @Mojo(name = "service-package", defaultPhase = LifecyclePhase.PACKAGE)
 public class ServicePackageMojo extends AbstractMojo {
     /**
-     * pakcage service type, NT or Systemd,default value is NT
+     * Package service type, Windows or Systemd,default value depends on the build runtime platform,In Windows
+     * the value is Windows,In Linux,the value is Systemd
      */
     @Parameter(required = false)
     public String serviceType;
     /**
-     * jre directory to copy
+     * The jre directory for copy
      */
     @Parameter(required = false)
     public File jreDirectory;
     /**
-     * if true and jreDirectory is null, use jlink to custom the java runtime image
+     * If true and jreDirectory is null, use jlink to custom the java runtime image
      */
     @Parameter(required = false,defaultValue = "false")
     public Boolean customRuntimeImage;
     /**
-     * if dependent libraries contains multi-release library,choose version:targetJreVersion 
+     * if dependent libraries contains multi-release library,choose version:targetJreVersion
+     * default value is 11
      */
     @Parameter(required = false,defaultValue = "11")
     public String targetJreVersion;
@@ -62,7 +64,7 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(required = false,defaultValue = "2")
     public String compressLevel;
     /**
-     * config properties for script generation
+     * config properties file for script generation
      */
     @Parameter(required = false)
     public File scriptConfigFile;
@@ -72,7 +74,7 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(required = false)
     public File outputDirectory;
     /**
-     * resources to be copied to the package base directory
+     * extra resources needed to be copied to the package base directory
      */
     @Parameter
     public List<ResourceDirectoryParameter> resources;
@@ -89,12 +91,11 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
     private List<MavenProject> projects;
     /**
-     * if true,package the output archive
+     * if true,output compressed file
      */
     @Parameter(required = false,defaultValue = "false")
     public Boolean outputZip;
     Log log;
-    
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -104,10 +105,10 @@ public class ServicePackageMojo extends AbstractMojo {
             if(JreUtils.isLinux()) {
                 serviceType=ServiceTypes.SYSTEMD;
             }else if(JreUtils.isWindows()){
-                serviceType=ServiceTypes.NT;
+                serviceType=ServiceTypes.WINDOWS;
             }
-        }else {
-            throw new MojoExecutionException("The parameter[serviceType] is empty!");
+        }else if(!ServiceTypes.WINDOWS.equals(serviceType) && !ServiceTypes.SYSTEMD.equals(serviceType)){
+            throw new MojoExecutionException("Unsupported service type:"+serviceType+"!");
         }
         log.info("Start to package "+serviceType+" Service");
         String buildOutputPath = mavenProject.getBuild().getDirectory();

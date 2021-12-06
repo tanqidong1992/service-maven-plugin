@@ -59,11 +59,11 @@ public class RuntimeImageCreator {
             throw new CustomJreImageException("resolve Jre modules failed!",e);
         }
         String output=pr.outputString(charsetName);
-        log.debug("resolveJreDependencies cmd:{},result:{}",StringUtils.join(cmds, " "),output);
         if(pr.getExitValue()!=0) {
-            log.warn("resolveJreDependencies cmd:{},result:{}",StringUtils.join(cmds, " "),output);
+            log.warn("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds, " "),output);
             return Collections.emptyList();
         }else{
+            log.info("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds, " "),output);
             return resolveModules(output);
         }
     }
@@ -135,7 +135,7 @@ public class RuntimeImageCreator {
         Set<String> jreModules=resolveJreModules(mainJar, dependentJars, targetJreVersion);
         String modulesStr=StringUtils.join(jreModules, ",");
         List<String> cmds=Arrays.asList("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr);
-        log.info("Custom java runtime image cmd:{}",StringUtils.join(cmds, " "));
+        log.info("Custom java runtime image cmd:\n{}\n",StringUtils.join(cmds, " "));
         ProcessResult result = new ProcessExecutor()
             .command("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr)
             .redirectError(Slf4jStream.of(log).asDebug())
@@ -159,7 +159,10 @@ public class RuntimeImageCreator {
             //尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
             List<String> dependentJreModules=resolveJreDependencies(jarFile, targetJreVersion);
             if(dependentJreModules.size()<=0) {
-                dependentJreModules=resolveJreDependencies(jarFile,dependentJars,multiReleaseJarContained,targetJreVersion);
+                List<File> newList=new ArrayList<>();
+                newList.addAll(dependentJars);
+                newList.remove(jarFile);
+                dependentJreModules=resolveJreDependencies(jarFile,newList,multiReleaseJarContained,targetJreVersion);
             }
             if(dependentJreModules.size()>0) {
                 synchronized(jreModules){

@@ -59,6 +59,4 @@ public class MainClassDetector {
         classWeight.name = classReader.getClassName().replace("/", ".");
         return classWeight;
     }
-
-
 }

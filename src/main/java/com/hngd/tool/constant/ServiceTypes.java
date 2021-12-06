@@ -3,9 +3,9 @@ package com.hngd.tool.constant;
 public class ServiceTypes {
 
     /**
-     * Windows NT Service
+     * Microsoft Windows Service
      */
-    public static final String NT="NT";
+    public static final String WINDOWS ="Windows";
     /**
      * Systemd Service
      */
