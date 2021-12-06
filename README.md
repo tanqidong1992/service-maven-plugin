@@ -1,7 +1,7 @@
 # Microsoft Windows/Systemd服务打包Maven插件
 ## 简述
 这是一个Maven插件项目,主要用于将Maven工程打包成一个可独立运行的Microsoft Windows/Systemd服务.
-## 主要功能
+## 功能特性
 - 复制工程运行所需的第三方依赖库,Java运行时到输出目录,对于Java 11.0.11+支持定制Java运行时.
 - 零配置,自动检测入口类,根据Maven工程信息生成Microsoft Windows/Systemd服务信息.
 - 支持生成Microsoft Windows/Systemd服务的安装,启动,停止,卸载脚本.
@@ -14,7 +14,7 @@
     <plugin>
         <groupId>com.hngd.tool</groupId>
         <artifactId>service-maven-plugin</artifactId>
-        <version>0.2.1-SNAPSHOT</version>
+        <version>0.2.2-SNAPSHOT</version>
         <executions>
             <execution>
                 <id>service-package</id>
