@@ -41,8 +41,8 @@ function stop(){
 function generateServiceUnitFile(){
     transformedAppRoot=$(echo "${BASE_DIR}" | sed "s/\//\\\\\//g")
     echo "transformed app root :${transformedAppRoot}"
-    sed "s/{{serviceDescription}}/${serviceDescription}/g;s/{{serviceName}}/${serviceName}/g;s/{{AppRoot}}/${transformedAppRoot}/g" sample.service  > ${serviceName}.service
-    cat ${serviceName}.service
+    sed "s/{{serviceDescription}}/${serviceDescription}/g;s/{{serviceName}}/${serviceName}/g;s/{{AppRoot}}/${transformedAppRoot}/g" ${BASE_DIR}/sample.service  > ${BASE_DIR}/${serviceName}.service
+    cat ${BASE_DIR}/${serviceName}.service
     echo
 }
 function installService(){
@@ -108,11 +108,11 @@ case "$op" in
   echo "Usage:"
   echo "./svc.sh [install,start,stop,status,uninstall]"
   echo "Commands:"
-  echo "  install: Install the service"
-  echo "  start: Manually start the service"
-  echo "  stop: Manually stop the service"
-  echo "  status: Display status of the service"
-  echo "  uninstall: Uninstall the service"
+  echo "  install: Install ${serviceName} service"
+  echo "  start: Manually start ${serviceName} service"
+  echo "  stop: Manually stop ${serviceName} service"
+  echo "  status: Display status of ${serviceName} service"
+  echo "  uninstall: Uninstall ${serviceName} service"
   echo 
   ;;
 esac
