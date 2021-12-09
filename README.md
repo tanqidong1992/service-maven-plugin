@@ -8,6 +8,7 @@
 - 支持生成控制台启动脚本.
 - 支持Spring Boot项目.
 - 支持提取Git中的版本信息.
+- 支持输出RPM Package spec文件.
 ## 使用
 ### 加入插件坐标
 ```xml

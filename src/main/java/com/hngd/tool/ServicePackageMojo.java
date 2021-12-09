@@ -95,6 +95,11 @@ public class ServicePackageMojo extends AbstractMojo {
      */
     @Parameter(required = false,defaultValue = "false")
     public Boolean outputZip;
+    /**
+     * if true,output RPM package spec file
+     */
+    @Parameter(required = false,defaultValue = "false")
+    public Boolean outputRpmSpec;
     Log log;
 
     @Override
@@ -167,7 +172,7 @@ public class ServicePackageMojo extends AbstractMojo {
 
         log.info("Generate scripts");
         try {
-            ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile,serviceType);
+            ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile,serviceType,outputRpmSpec);
         } catch (ScriptGenerationException e) {
             log.error("", e);
             throw new MojoExecutionException("Generate scripts failed!",e);

@@ -201,6 +201,7 @@
 					<include>**/*.sh</include>
 					<include>**/*.exe</include>
 					<include>**/*.service</include>
+					<include>**/*.spec</include>
 				</includes>
 			</resource>
 		</resources>

@@ -9,10 +9,14 @@ import com.hngd.tool.constant.Constants;
 
 public class ConfigItems {
 
-    public static final String INNER_PROJECT_NAME="#projectName";
-    public static final String INNER_PROJECT_DESCRIPTION="#projectDescription";
-    public static final String INNER_PROJECT_MAIN_CLASS="#projectMainClass";
-    public static final String INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE="#projectMainClassSupportService";
+    public static final String INNER_PROJECT_NAME="_projectName";
+    public static final String INNER_PROJECT_DESCRIPTION="_projectDescription";
+    public static final String INNER_PROJECT_MAIN_CLASS="_projectMainClass";
+    public static final String INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE="_projectMainClassSupportService";
+    public static final String INNER_PROJECT_VERSION="_projectVersion";
+    public static final String INNER_PROJECT_URL="_projectUrl";
+    public static final String INNER_PROJECT_LICENSE="_projectLicense";
+
     public static final String KEY_SUPPORT_SERVICE = "supportService";
     public static final String KEY_SERVICE_DESCRIPTION = "serviceDescription";
     public static final String KEY_SERVICE_DISPLAY_NAME = "serviceDisplayName";

@@ -7,11 +7,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.hngd.tool.generator.impl.RpmSpecGenerator;
+import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.beetl.core.exception.BeetlException;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,30 +35,42 @@ public class ScriptGeneratorContext {
             File configFile,
             File outputDir,
             File dependenciesDirectory,
-            File jarFile,String serviceType) throws ScriptGenerationException{
+            File jarFile, String serviceType,
+            Boolean outputRpmSpec) throws ScriptGenerationException{
          
         String configPath=configFile!=null?configFile.getAbsolutePath():null;
         Properties properties=new Properties();
         if(StringUtils.isNotEmpty(configPath)) {
             properties=loadConfig(configPath);
         }
-        ScriptGenerator ntsg=null;
+        ScriptGenerator scriptGenerator;
         if(ServiceTypes.WINDOWS.equals(serviceType)) {
-            ntsg=new WindowsServiceScriptGenerator();
+            scriptGenerator=new WindowsServiceScriptGenerator();
         }else {
-            ntsg=new SystemdScriptGenerator();
+            scriptGenerator=new SystemdScriptGenerator();
         }
         Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath());
         fixAbsentProperties(properties,mavenContext);
         Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
+        injectMavenProperties(context,mavenContext);
         if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
             try {
-                ntsg.generateServiceScript(outputDir, context);
+                scriptGenerator.generateServiceScript(outputDir, context);
             } catch (BeetlException | IOException e) {
                 throw new ScriptGenerationException("", e);
             }
         }
-        ntsg.generateConsoleScript(outputDir, context);
+        scriptGenerator.generateConsoleScript(outputDir, context);
+        if(outputRpmSpec && ServiceTypes.SYSTEMD.equals(serviceType)){
+            new RpmSpecGenerator().generateSpecFile(outputDir.getParentFile(),context);
+        }
+    }
+
+    private static void injectMavenProperties(Map<String,Object> properties, Map<String, Object> mavenContext){
+        //inject all maven properties
+        mavenContext.forEach((k,v)->{
+            properties.put(k,v);
+        });
     }
 
     private static void fixAbsentProperties(Properties properties, Map<String, Object> mavenContext) {
@@ -91,7 +103,7 @@ public class ScriptGeneratorContext {
             Object mainClassSupportService=mavenContext.get(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE);
             properties.put(ConfigItems.KEY_SUPPORT_SERVICE, mainClassSupportService);
         }
-         
+
     }
 
     private static Map<String, Object> initializeMavenContext(MavenProject mavenProject,String mainJarFilePath) {
@@ -120,6 +132,22 @@ public class ScriptGeneratorContext {
             context.put(ConfigItems.INNER_PROJECT_NAME, name);
         }else {
             context.put(ConfigItems.INNER_PROJECT_NAME, artifactId);
+        }
+
+        List<License> licenses=mavenProject.getLicenses();
+        if(licenses!=null && licenses.size()>0){
+            String licenseStr=licenses.stream()
+                    .map(License::getName)
+                    .collect(Collectors.joining(","));
+            context.put(ConfigItems.INNER_PROJECT_LICENSE,licenseStr);
+        }
+        String version=mavenProject.getVersion();
+        if(StringUtils.isNotBlank(version)){
+            context.put(ConfigItems.INNER_PROJECT_VERSION,version);
+        }
+        String url= mavenProject.getUrl();
+        if(StringUtils.isNotBlank(url)){
+            context.put(ConfigItems.INNER_PROJECT_URL,url);
         }
         return context;
     }
