@@ -52,7 +52,7 @@ public class RuntimeImageCreator {
         }
         cmds.add(mainJar.getAbsolutePath());
 
-        ProcessResult pr=null;
+        ProcessResult pr;
         try {
             pr = executeCmd(cmds);
         } catch (InvalidExitValueException | IOException | InterruptedException | TimeoutException e) {

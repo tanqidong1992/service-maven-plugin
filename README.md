@@ -119,7 +119,7 @@ public class EntryClass{
 mvn clean package install -DskipTests
 ```
 ## 注意事项
-1. 目前Microsoft Windows服务只能在Windows环境下生成,Systemd服务只能在Linux环境下生成.
+1. 在Windows环境下无法定制Linux JRE运行时,同理,在Linux环境下无法定制Windows JRE运行时.
 ## 参考
 1. [Maven Plugin Development](https://maven.apache.org/plugin-developers/index.html)
 2. [commons-daemon]( http://commons.apache.org/proper/commons-daemon/procrun.html )

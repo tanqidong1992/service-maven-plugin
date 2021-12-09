@@ -49,7 +49,7 @@ public class ScriptGeneratorContext {
         }else {
             scriptGenerator=new SystemdScriptGenerator();
         }
-        Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath());
+        Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath(),serviceType);
         fixAbsentProperties(properties,mavenContext);
         Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
         injectMavenProperties(context,mavenContext);
@@ -106,7 +106,9 @@ public class ScriptGeneratorContext {
 
     }
 
-    private static Map<String, Object> initializeMavenContext(MavenProject mavenProject,String mainJarFilePath) {
+    private static Map<String, Object> initializeMavenContext(MavenProject mavenProject,
+                                                              String mainJarFilePath,
+                                                              String serviceType) {
         Map<String,Object> context=new HashMap<>();
         String name=mavenProject.getName();
         String artifactId=mavenProject.getArtifactId();
@@ -121,7 +123,7 @@ public class ScriptGeneratorContext {
             ClassWeight mainClass=optionalMainClass.get();
             context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS, mainClass.name);
             //main onStart onStop
-            if(mainClass.weight>=3) {
+            if(mainClass.weight>=3 || ServiceTypes.SYSTEMD.equals(serviceType)) {
                 context.put(ConfigItems.INNER_PROJECT_MAIN_CLASS_SUPPORT_SERVICE, "true");
             }
         }
