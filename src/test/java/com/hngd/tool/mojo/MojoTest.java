@@ -2,7 +2,6 @@ package com.hngd.tool.mojo;
 
 import java.io.File;
 
-import com.hngd.tool.DependencyTestMojo;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.*;
 import org.eclipse.aether.RepositorySystemSession;

@@ -224,7 +224,9 @@ public class ServicePackageMojo extends AbstractMojo {
                 FileUtils.copyDirectoryStructureIfModified(jreDirectory, outputJreDirectory);
             } catch (IOException e) {
                 log.error("", e);
-                throw new MojoExecutionException("复制Jre失败!",e);
+                throw new MojoExecutionException("Copy Jre Directory["+
+                        jreDirectory.getAbsolutePath()
+                        +"] failed!",e);
             }
         }
         

@@ -1,9 +1,11 @@
 #!/bin/bash
 
-if [ ! $(id -u) -eq 0 ]; then
-    echo "The script should run as root!"
-    exit 1
-fi
+function requireRunAsRoot(){
+  if [ ! $(id -u) -eq 0 ]; then
+      echo "The script should run as root!"
+      exit 1
+  fi
+}
 
 if [ -e "/etc/redhat-release" ]; then
     installationPath="/usr/lib/systemd/system"
@@ -97,18 +99,23 @@ case "$op" in
       stop
   ;;
   start)
+      requireRunAsRoot
       startService
   ;;
   stop)
+      requireRunAsRoot
       stopService
   ;;
   status)
+    requireRunAsRoot
     displayServiceStatus
   ;;
   install)
+      requireRunAsRoot
       installService
   ;;
   uninstall)
+      requireRunAsRoot
       uninstallService
   ;;
   *)

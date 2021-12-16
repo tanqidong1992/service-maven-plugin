@@ -28,7 +28,7 @@ public class RpmSpecGenerator{
         try {
             cfg = Configuration.defaultConfiguration();
         } catch (IOException e) {
-            throw new ScriptGenerationException("模板引擎初始化失败!",e);
+            throw new ScriptGenerationException("Failed to initialize the template engine!",e);
         }
         groupTemplate = new GroupTemplate(resourceLoader, cfg);
     }
@@ -49,7 +49,7 @@ public class RpmSpecGenerator{
         try {
             Files.write(specFile.toPath(), specContent.getBytes(), StandardOpenOption.CREATE);
         } catch (BeetlException | IOException e) {
-            throw new ScriptGenerationException("文件"+specFile.getAbsolutePath()+"写入操作错误!",e);
+            throw new ScriptGenerationException("File write error:"+specFile.getAbsolutePath(),e);
         }
         //restore version
         context.put(ConfigItems.INNER_PROJECT_VERSION,originVersion);
@@ -64,7 +64,7 @@ public class RpmSpecGenerator{
         try {
             Files.write(rpmbuildFile.toPath(), rpmbuildScript.getBytes(), StandardOpenOption.CREATE);
         } catch (BeetlException | IOException e) {
-            throw new ScriptGenerationException("文件"+specFile.getAbsolutePath()+"写入操作错误!",e);
+            throw new ScriptGenerationException("File write error:"+specFile.getAbsolutePath(),e);
         }
     }
 }

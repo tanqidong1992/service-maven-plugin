@@ -1,4 +1,4 @@
-package com.hngd.tool;
+package com.hngd.tool.mojo;
 
 import com.hngd.tool.utils.MavenProjectUtils;
 

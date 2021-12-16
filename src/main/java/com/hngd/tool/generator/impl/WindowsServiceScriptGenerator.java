@@ -37,7 +37,7 @@ public class WindowsServiceScriptGenerator implements ScriptGenerator {
         try {
             cfg = Configuration.defaultConfiguration();
         } catch (IOException e) {
-            throw new ScriptGenerationException("模板引擎初始化失败!",e);
+            throw new ScriptGenerationException("Failed to initialize the template engine!",e);
         }
         groupTemplate = new GroupTemplate(resourceLoader, cfg);
     }

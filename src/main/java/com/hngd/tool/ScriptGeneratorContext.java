@@ -35,7 +35,8 @@ public class ScriptGeneratorContext {
             File configFile,
             File outputDir,
             File dependenciesDirectory,
-            File jarFile, String serviceType,
+            File jarFile,
+            String serviceType,
             Boolean outputRpmSpec,
             String after,
             String wantedBy) throws ScriptGenerationException{
@@ -45,8 +46,6 @@ public class ScriptGeneratorContext {
         if(StringUtils.isNotEmpty(configPath)) {
             properties=loadConfig(configPath);
         }
-        properties.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
-        properties.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
         ScriptGenerator scriptGenerator;
         if(ServiceTypes.WINDOWS.equals(serviceType)) {
             scriptGenerator=new WindowsServiceScriptGenerator();
@@ -55,8 +54,12 @@ public class ScriptGeneratorContext {
         }
         Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath(),serviceType);
         fixAbsentProperties(properties,mavenContext);
+
         Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
+        context.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
+        context.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
         injectMavenProperties(context,mavenContext);
+
         if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
             try {
                 scriptGenerator.generateServiceScript(outputDir, context);
@@ -70,8 +73,12 @@ public class ScriptGeneratorContext {
         }
     }
 
+    /**
+     * inject all maven properties to properties
+     * @param properties
+     * @param mavenContext
+     */
     private static void injectMavenProperties(Map<String,Object> properties, Map<String, Object> mavenContext){
-        //inject all maven properties
         mavenContext.forEach((k,v)->{
             properties.put(k,v);
         });
@@ -82,7 +89,7 @@ public class ScriptGeneratorContext {
         if(!properties.containsKey(ConfigItems.KEY_MAIN_CLASS)) {
             
             if(!mavenContext.containsKey(ConfigItems.INNER_PROJECT_MAIN_CLASS)) {
-                throw new ScriptGenerationException("没有找到合适的启动类", null);
+                throw new ScriptGenerationException("No suitable main class was found!", null);
             }
             Object mainClass=mavenContext.get(ConfigItems.INNER_PROJECT_MAIN_CLASS);
             properties.put(ConfigItems.KEY_MAIN_CLASS, mainClass);
@@ -177,9 +184,9 @@ public class ScriptGeneratorContext {
             properties.load(reader);
         } catch (IOException e) {
             if(e instanceof FileNotFoundException){
-                throw new RuntimeException("配置文件"+configPath+"不存在",e);
+                throw new RuntimeException("The configuration file ["+configPath+"] dose not exist!",e);
             }else {
-                throw new RuntimeException("配置文件"+configPath+"读取失败",e);
+                throw new RuntimeException("Failed to read the configuration file: "+configPath,e);
             }
         } 
         return properties;
