@@ -9,6 +9,10 @@ import com.hngd.tool.constant.Constants;
 
 public class ConfigItems {
 
+
+    public static final String SYSTEMD_UNIT_AFTER="after";
+    public static final String SYSTEMD_UNIT_WANTED_BY="wantedBy";
+
     public static final String INNER_PROJECT_NAME="_projectName";
     public static final String INNER_PROJECT_DESCRIPTION="_projectDescription";
     public static final String INNER_PROJECT_MAIN_CLASS="_projectMainClass";

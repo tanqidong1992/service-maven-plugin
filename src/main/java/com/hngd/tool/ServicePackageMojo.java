@@ -100,6 +100,18 @@ public class ServicePackageMojo extends AbstractMojo {
      */
     @Parameter(required = false,defaultValue = "false")
     public Boolean outputRpmSpec;
+
+    /**
+     * Systemd Unit file WantedBy,default value is "multi-user.target"
+     */
+    @Parameter(required = false,defaultValue = "multi-user.target")
+    public String wantedBy;
+    /**
+     * Systemd Unit file After,default value is "network.target"
+     */
+    @Parameter(required = false,defaultValue = "network.target")
+    public String after;
+
     Log log;
 
     @Override
@@ -172,7 +184,15 @@ public class ServicePackageMojo extends AbstractMojo {
 
         log.info("Generate scripts");
         try {
-            ScriptGeneratorContext.generateScripts(mavenProject,scriptConfigFile, outputDirectory, dependentLibDirectory, mainJarFile,serviceType,outputRpmSpec);
+            ScriptGeneratorContext.generateScripts(mavenProject,
+                    scriptConfigFile,
+                    outputDirectory,
+                    dependentLibDirectory,
+                    mainJarFile,
+                    serviceType,
+                    outputRpmSpec,
+                    after,
+                    wantedBy);
         } catch (ScriptGenerationException e) {
             log.error("", e);
             throw new MojoExecutionException("Generate scripts failed!",e);

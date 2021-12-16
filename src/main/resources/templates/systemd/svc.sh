@@ -49,7 +49,7 @@ function stop(){
 function generateServiceUnitFile(){
     transformedAppRoot=$(echo "${BASE_DIR}" | sed "s/\//\\\\\//g")
     echo "transformed app root :${transformedAppRoot}"
-    sed "s/{{serviceDescription}}/${serviceDescription}/g;s/{{serviceName}}/${serviceName}/g;s/{{AppRoot}}/${transformedAppRoot}/g" ${BASE_DIR}/sample.service  > ${BASE_DIR}/${serviceName}.service
+    sed "s/{{wantedBy}}/${wantedBy}/g;s/{{after}}/${after}/g;s/{{serviceDescription}}/${serviceDescription}/g;s/{{serviceName}}/${serviceName}/g;s/{{AppRoot}}/${transformedAppRoot}/g" ${BASE_DIR}/sample.service  > ${BASE_DIR}/${serviceName}.service
     cat ${BASE_DIR}/${serviceName}.service
     echo
 }

@@ -36,13 +36,17 @@ public class ScriptGeneratorContext {
             File outputDir,
             File dependenciesDirectory,
             File jarFile, String serviceType,
-            Boolean outputRpmSpec) throws ScriptGenerationException{
+            Boolean outputRpmSpec,
+            String after,
+            String wantedBy) throws ScriptGenerationException{
          
         String configPath=configFile!=null?configFile.getAbsolutePath():null;
         Properties properties=new Properties();
         if(StringUtils.isNotEmpty(configPath)) {
             properties=loadConfig(configPath);
         }
+        properties.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
+        properties.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
         ScriptGenerator scriptGenerator;
         if(ServiceTypes.WINDOWS.equals(serviceType)) {
             scriptGenerator=new WindowsServiceScriptGenerator();

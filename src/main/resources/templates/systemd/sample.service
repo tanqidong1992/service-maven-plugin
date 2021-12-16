@@ -1,6 +1,6 @@
 [Unit]
 Description={{serviceDescription}}
-After=network.target
+After={{after}}
 
 [Service]
 Type=forking
@@ -10,4 +10,4 @@ WorkingDirectory={{AppRoot}}
 TimeoutStopSec=5min
 
 [Install]
-WantedBy=multi-user.target
+WantedBy={{wantedBy}}

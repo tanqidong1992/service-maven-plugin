@@ -2,6 +2,7 @@ package com.hngd.tool.generator.impl;
 
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.exception.ScriptGenerationException;
+import com.hngd.tool.utils.VersionUtils;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
@@ -33,6 +34,11 @@ public class RpmSpecGenerator{
     }
 
     public void generateSpecFile(File outputDir, Map<String, Object> context) {
+
+        //fix version
+        String originVersion=context.get(ConfigItems.INNER_PROJECT_VERSION).toString();
+        String newVersion= VersionUtils.fixToRpmVersion(originVersion);
+        context.put(ConfigItems.INNER_PROJECT_VERSION,newVersion);
         Template spec=groupTemplate.getTemplate(SPEC);
         spec.binding(context);
         File specFile=new File(outputDir,context.get(ConfigItems.KEY_SERVICE_NAME)+".spec");
@@ -45,7 +51,8 @@ public class RpmSpecGenerator{
         } catch (BeetlException | IOException e) {
             throw new ScriptGenerationException("文件"+specFile.getAbsolutePath()+"写入操作错误!",e);
         }
-
+        //restore version
+        context.put(ConfigItems.INNER_PROJECT_VERSION,originVersion);
 
         Template rpmbuild=groupTemplate.getTemplate(RPMBUILD_BUILD);
         rpmbuild.binding(context);
