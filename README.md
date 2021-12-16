@@ -43,6 +43,7 @@ mvn clean package #-DskipTests
 - outputDirectory,指定打包输出目录,默认值为${project.build.directory}/${project.artifactId}
 - resources,资源目录或者文件,配置后将复制到输出目录.
 - serviceType,服务类型,可取值有:Windows,Systemd,在Windows环境下默认为Windows,Linux环境下默认为Systemd;Windows表示打包生成Microsoft Windows服务脚本,Systemd表示打包生成Systemd服务脚本.
+
 **备注:以上所有配置项都是可选的**
 ### 打包配置文件说明
 ```properties

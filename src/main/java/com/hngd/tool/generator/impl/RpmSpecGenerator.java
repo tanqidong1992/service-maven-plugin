@@ -18,6 +18,7 @@ import java.util.Map;
 public class RpmSpecGenerator{
 
     public static final String SPEC ="sample.spec";
+    public static final String RPMBUILD_BUILD ="rpmbuild-build.sh";
     public static final String SCRIPT_TEMPLATE_ROOT="/templates/rpm";
     GroupTemplate groupTemplate;
     public RpmSpecGenerator() {
@@ -32,15 +33,29 @@ public class RpmSpecGenerator{
     }
 
     public void generateSpecFile(File outputDir, Map<String, Object> context) {
-        Template run=groupTemplate.getTemplate(SPEC);
-        run.binding(context);
+        Template spec=groupTemplate.getTemplate(SPEC);
+        spec.binding(context);
         File specFile=new File(outputDir,context.get(ConfigItems.KEY_SERVICE_NAME)+".spec");
         if(specFile.exists()){
             specFile.delete();
         }
-        String script=run.render();
+        String specContent=spec.render();
         try {
-            Files.write(specFile.toPath(), script.getBytes(), StandardOpenOption.CREATE);
+            Files.write(specFile.toPath(), specContent.getBytes(), StandardOpenOption.CREATE);
+        } catch (BeetlException | IOException e) {
+            throw new ScriptGenerationException("文件"+specFile.getAbsolutePath()+"写入操作错误!",e);
+        }
+
+
+        Template rpmbuild=groupTemplate.getTemplate(RPMBUILD_BUILD);
+        rpmbuild.binding(context);
+        File rpmbuildFile=new File(outputDir,RPMBUILD_BUILD);
+        if(rpmbuildFile.exists()){
+            rpmbuildFile.delete();
+        }
+        String rpmbuildScript=rpmbuild.render();
+        try {
+            Files.write(rpmbuildFile.toPath(), rpmbuildScript.getBytes(), StandardOpenOption.CREATE);
         } catch (BeetlException | IOException e) {
             throw new ScriptGenerationException("文件"+specFile.getAbsolutePath()+"写入操作错误!",e);
         }

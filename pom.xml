@@ -221,7 +221,6 @@
 				</reportSets>
 			</plugin>
 		</plugins>
-
 	</reporting>
 	<distributionManagement>
 		<repository>

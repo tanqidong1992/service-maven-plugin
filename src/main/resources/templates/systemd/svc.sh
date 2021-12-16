@@ -4,6 +4,14 @@ if [ ! $(id -u) -eq 0 ]; then
     echo "The script should run as root!"
     exit 1
 fi
+
+if [ -e "/etc/redhat-release" ]; then
+    installationPath="/usr/lib/systemd/system"
+else
+    installationPath="/etc/systemd/system"
+fi
+
+
 scriptFilePath=$(readlink -f "$0")
 BASE_DIR=$(dirname ${scriptFilePath})
 WORK_DIR="${BASE_DIR}"
@@ -22,7 +30,7 @@ function start(){
         echo "$!" > ${WORK_DIR}/${serviceName}.pid
         return 0
     else
-        echo "Start service fialed!"
+        echo "Start service failed!"
         return 1
     fi
 }
@@ -47,11 +55,11 @@ function generateServiceUnitFile(){
 }
 function installService(){
     echo "Install service"
-    if [ -e "/etc/systemd/system/${serviceName}.service" ]; then
+    if [ -e "${installationPath}/${serviceName}.service" ]; then
         echo "The service is already installed!"
     else
         generateServiceUnitFile
-        mv "${WORK_DIR}/${serviceName}.service" "/etc/systemd/system/${serviceName}.service"
+        mv "${WORK_DIR}/${serviceName}.service" "${installationPath}/${serviceName}.service"
         systemctl daemon-reload
         systemctl enable ${serviceName}.service
     fi
@@ -66,13 +74,13 @@ function stopService(){
     sudo systemctl stop ${serviceName}.service
 }
 function uninstallService(){
-    echo "Uninstall serevice!"
+    echo "Uninstall service!"
     stopService
     sudo systemctl disable ${serviceName}.service
-    if [ -e "/etc/systemd/system/${serviceName}.service" ]; then
-        rm "/etc/systemd/system/${serviceName}.service"
+    if [ -e "${installationPath}/${serviceName}.service" ]; then
+        rm "${installationPath}/${serviceName}.service"
     else
-        echo "Failed to delete service unit file:/etc/systemd/system/${serviceName}.service"
+        echo "Failed to delete service unit file:${installationPath}/${serviceName}.service"
     fi
     systemctl daemon-reload
      
