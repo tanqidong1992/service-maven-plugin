@@ -1,4 +1,4 @@
-package com.hngd.tool.utils;
+package com.hngd.tool.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +13,7 @@ import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hngd.classloader.ProjectClassLoader;
+import com.hngd.tool.classloader.ProjectClassLoader;
 import com.hngd.tool.constant.Constants;
 
 public class MainClassDetector {

@@ -54,7 +54,7 @@ serviceDisplayName=demo-service
 #服务描述内容,如果为空,插件会取POM文件中的${project.description}或者serviceName作为此项的值
 serviceDescription=测试服务
 #Java程序启动类,如果为空,那么插件会去寻找一个合适的类作为此项的值
-mainClass=com.hngd.ServiceMain
+mainClass=com.test.ServiceMain
 #Microsoft Windows服务启动时，调用的Java方法,默认值为onStart,此配置项仅对Microsoft Windows服务有效
 startMethod=onStart     
 #Microsoft Windows服务停止时，调用的Java方法,默认值为onStop,此配置项仅对Microsoft Windows服务有效
@@ -68,7 +68,7 @@ jvmMx=1024m
 #服务启动方式,可取值为delayed(延迟启动), auto(自动启动) or manual(手动启动),默认为manual,此配置项仅对Microsoft Windows服务有效,Systemd服务默认安装为开机自启动
 startup=auto
 #配置生成其他主入口类控制台启动脚本,生成文件名称为run.${类名}.bat
-additionalMainClass=com.hngd.Main1,com.hngd.Main2,com.hngd.Main3
+additionalMainClass=com.test.Main1,com.test.Main2,com.test.Main3
 #更多参数设置将在后续支持
 ```
 **配置文件不是必须的**,如果你的项目中存在一个以下形式的类,那么配置文件是可以省略的
@@ -113,7 +113,7 @@ public class EntryClass{
 └── svc.sh                                    #Systemd服务操作脚本
 ```
 ## 编译环境
-1. Oracle JDK 1.8.
+1. OpenJDK 1.8.
 2. Apache Maven 3.3.3及以上.
 ## 安装
 ```shell
@@ -127,3 +127,5 @@ mvn clean package install -DskipTests
 3. [jlink]( https://docs.oracle.com/en/java/javase/17/docs/specs/man/jlink.html )
 4. [jdeps]( https://docs.oracle.com/en/java/javase/17/docs/specs/man/jdeps.html )
 5. [Microsoft Windows服务](https://docs.microsoft.com/zh-cn/dotnet/framework/windows-services/)
+6. [Systemd](https://www.freedesktop.org/wiki/Software/systemd/)
+7. [shc](https://github.com/neurobin/shc)

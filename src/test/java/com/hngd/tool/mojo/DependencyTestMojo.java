@@ -1,9 +1,6 @@
 package com.hngd.tool.mojo;
 
-import com.hngd.tool.utils.MavenProjectUtils;
-
 import lombok.Data;
-import lombok.Setter;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;

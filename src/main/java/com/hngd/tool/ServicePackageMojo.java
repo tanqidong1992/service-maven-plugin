@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.hngd.tool.generator.ScriptGeneratorContext;
+import com.hngd.tool.util.*;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,10 +23,6 @@ import org.codehaus.plexus.util.FileUtils;
 import com.hngd.tool.MojoParameters.ResourceDirectoryParameter;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
-import com.hngd.tool.utils.BuildInfoUtils;
-import com.hngd.tool.utils.CompressUtils;
-import com.hngd.tool.utils.JreUtils;
-import com.hngd.tool.utils.MavenProjectUtils;
 
 /**
  * Service Scripts Generator MOJO
@@ -137,7 +135,7 @@ public class ServicePackageMojo extends AbstractMojo {
         String originalTargetJarFileName = targetJarFileName;
         log.debug("Target jar file name is " + targetJarFileName);
         if (MavenProjectUtils.isSpringBootPluginExist(mavenProject)) {
-            log.info("The project is packaged as spring boot fat jar,we need to obtain the origin jar file!");
+            log.debug("The project is packaged as spring boot fat jar,we need to obtain the origin jar file!");
             targetJarFileName += ".original";
             //新版本的Spring Boot Maven Plugin不会改变原始jar的文件名，而是把fat jar命名为${原始jar名称}-exec
             String targetMainJarFilePath = buildOutputPath + File.separator + targetJarFileName;
@@ -151,7 +149,7 @@ public class ServicePackageMojo extends AbstractMojo {
             throw new MojoExecutionException("The target jar file["+targetMainJarFilePath+"] is not found!"
                     + "You may need to execute mvn package first!");
         }
-        log.info("Clean output directory:"+outputDirectory.getAbsolutePath());
+        log.info("Prepare output directory:"+outputDirectory.getAbsolutePath());
         if (outputDirectory.exists()) {
             try {
                 FileUtils.deleteDirectory(outputDirectory);
@@ -198,28 +196,26 @@ public class ServicePackageMojo extends AbstractMojo {
             throw new MojoExecutionException("Generate scripts failed!",e);
         }
 
-        log.info("Copy or custom java runtime image");
+        log.debug("Copy or custom java runtime image");
         File outputJreDirectory = new File(outputDirectory, "jre");
         outputJreDirectory.mkdirs();
-        
         if(jreDirectory==null && customRuntimeImage && JreUtils.atLeastJava11()) {
-            log.info("Start to custom java runtime image...");
+            log.info("Make a custom java runtime image");
             long startTime=System.currentTimeMillis();
             try {
                 RuntimeImageCreator.build(mainJarFile,dependentLibDirectory,outputJreDirectory,targetJreVersion,compressLevel);
             } catch (Exception e) {
                 log.error("", e);
-                throw new MojoExecutionException("Custom java runtime image failed!",e);
+                throw new MojoExecutionException("Failed to make a custom java runtime image!",e);
             }
-            log.info("Custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
+            log.info("Make custom java runtime image using time:"+(System.currentTimeMillis()-startTime)+"ms");
         }else {
-            
+            log.info("Copy java runtime image");
             if (jreDirectory == null) {
                 String defaultJrePath = JreUtils.getDefaultJrePath();
-                log.info("The config item[jreDirectory] is empty, using default jre path:" + defaultJrePath);
+                log.debug("The config item[jreDirectory] is empty, using default jre path:" + defaultJrePath);
                 jreDirectory = new File(defaultJrePath);
             }
-            
             try {
                 FileUtils.copyDirectoryStructureIfModified(jreDirectory, outputJreDirectory);
             } catch (IOException e) {
@@ -230,7 +226,7 @@ public class ServicePackageMojo extends AbstractMojo {
             }
         }
         
-        log.info("Start to generate build info");
+        log.info("Generate build info");
         try {
             BuildInfoUtils.generateBuildInfo(mavenProject.getBasedir(), outputDirectory);
         } catch (IOException e) {
@@ -247,12 +243,12 @@ public class ServicePackageMojo extends AbstractMojo {
         
         if(outputZip) {
             log.info("Package the output archive");
-            CompressUtils.compressWithBuffer(archiveFile, outputDirectory);
+            CompressUtils.compress(archiveFile, outputDirectory);
         }
     }
  
     private void copyResourceDirectories() throws IOException {
-        log.info("Start to copy resources");
+        log.debug("Start to copy resources");
         if(resources==null) {
             return;
         }

@@ -1,4 +1,4 @@
-package com.hngd.tool;
+package com.hngd.tool.generator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,13 +21,14 @@ import com.hngd.tool.config.NameValuePair;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.constant.ServiceTypes;
 import com.hngd.tool.exception.ScriptGenerationException;
-import com.hngd.tool.generator.ScriptGenerator;
+
 import com.hngd.tool.generator.impl.WindowsServiceScriptGenerator;
 import com.hngd.tool.generator.impl.SystemdScriptGenerator;
-import com.hngd.tool.utils.ClassWeight;
-import com.hngd.tool.utils.MainClassDetector;
+import com.hngd.tool.util.ClassWeight;
+import com.hngd.tool.util.MainClassDetector;
 
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class ScriptGeneratorContext {
 
@@ -79,9 +80,7 @@ public class ScriptGeneratorContext {
      * @param mavenContext
      */
     private static void injectMavenProperties(Map<String,Object> properties, Map<String, Object> mavenContext){
-        mavenContext.forEach((k,v)->{
-            properties.put(k,v);
-        });
+        properties.putAll(mavenContext);
     }
 
     private static void fixAbsentProperties(Properties properties, Map<String, Object> mavenContext) {

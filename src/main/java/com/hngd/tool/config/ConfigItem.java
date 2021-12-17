@@ -49,7 +49,7 @@ public class ConfigItem {
             value=this.defaultValue;
         }
         if(this.required && value==null) {
-            throw new ScriptGenerationException("缺少必要的配置项:"+this.name, null);
+            throw new ScriptGenerationException("The required configuration item:"+this.name+" is missing!", null);
         }
         NameValuePair nameValuePair=new NameValuePair();
         nameValuePair.setName(this.name);

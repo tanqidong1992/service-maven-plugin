@@ -3,7 +3,7 @@ package com.hngd.tool.generator.impl;
 import com.hngd.tool.config.ConfigItems;
 
 import com.hngd.tool.generator.ScriptGenerator;
-import com.hngd.tool.utils.VersionUtils;
+import com.hngd.tool.util.VersionUtils;
 
 import java.io.File;
 

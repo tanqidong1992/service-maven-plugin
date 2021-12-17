@@ -1,4 +1,4 @@
-package com.hngd.tool;
+package com.hngd.tool.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +20,9 @@ import java.util.stream.Stream;
 
 import com.hngd.tool.exception.CustomJreImageException;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
+
 import org.zeroturnaround.exec.InvalidExitValueException;
 import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.ProcessResult;
@@ -43,10 +44,9 @@ public class RuntimeImageCreator {
             cmds.add(jreVersion);
         }
         if (dependentJars != null && !dependentJars.isEmpty()) {
-            List<String> jarFilePaths = dependentJars.stream()
+            String classpath = dependentJars.stream()
                     .map(File::getAbsolutePath)
-                    .collect(Collectors.toList());
-            String classpath = StringUtils.join(jarFilePaths, ";");
+                    .collect(Collectors.joining(";"));
             cmds.add("-cp");
             cmds.add(classpath);
         }
@@ -60,10 +60,10 @@ public class RuntimeImageCreator {
         }
         String output=pr.outputString(charsetName);
         if(pr.getExitValue()!=0) {
-            log.warn("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds, " "),output);
+            log.warn("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds.iterator(), " "),output);
             return Collections.emptyList();
         }else{
-            log.info("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds, " "),output);
+            log.info("resolveJreDependencies cmd:\n{}\n,result:{}",StringUtils.join(cmds.iterator(), " "),output);
             return resolveModules(output);
         }
     }
@@ -133,9 +133,9 @@ public class RuntimeImageCreator {
            .filter(f->f.getName().endsWith(".jar"))
            .collect(Collectors.toList());
         Set<String> jreModules=resolveJreModules(mainJar, dependentJars, targetJreVersion);
-        String modulesStr=StringUtils.join(jreModules, ",");
+        String modulesStr=StringUtils.join(jreModules.iterator(), ",");
         List<String> cmds=Arrays.asList("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr);
-        log.info("Custom java runtime image cmd:\n{}\n",StringUtils.join(cmds, " "));
+        log.info("Custom java runtime image cmd:\n{}\n",StringUtils.join(cmds.iterator(), " "));
         ProcessResult result = new ProcessExecutor()
             .command("jlink","--compress",compressLevel,"--output",outputJreDirectory.getAbsolutePath(),"--add-modules",modulesStr)
             .redirectError(Slf4jStream.of(log).asDebug())
@@ -151,10 +151,8 @@ public class RuntimeImageCreator {
     protected static Set<String> resolveJreModules(File mainJar,List<File> dependentJars,String targetJreVersion){
         log.debug("Start analysis dependent jar jre modules");
         Set<String> jreModules=new HashSet<>();
-        boolean multiReleaseJarContained=dependentJars.stream()
-            .filter(RuntimeImageCreator::isMultiReleaseJar)
-            .findFirst()
-            .isPresent();
+        boolean multiReleaseJarContained= dependentJars.stream()
+            .anyMatch(RuntimeImageCreator::isMultiReleaseJar);
         dependentJars.parallelStream().forEach(jarFile->{
             //尝试单独分析某一个jar,如果分析失败,将依赖jar传入cp参数再一次分析
             List<String> dependentJreModules=resolveJreDependencies(jarFile, targetJreVersion);

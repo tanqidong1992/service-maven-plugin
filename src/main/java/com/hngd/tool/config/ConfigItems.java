@@ -75,7 +75,7 @@ public class ConfigItems {
  
     public static List<ConfigItem> getAllConfigItems(){
         Field[]  fields=ConfigItems.class.getFields();
-        if(fields==null) {
+        if(fields.length==0) {
             return Collections.emptyList();
         }
         List<ConfigItem> all=new LinkedList<>();

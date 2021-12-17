@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-import com.hngd.tool.utils.BuildInfoUtils;
+import com.hngd.tool.util.BuildInfoUtils;
 
 
 public class JGitTest {

@@ -1,6 +1,4 @@
-package com.hngd.tool.utils;
-
-import java.util.regex.Pattern;
+package com.hngd.tool.util;
 
 public class VersionUtils {
     /**

@@ -13,7 +13,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.testing.MojoRule;
-import org.apache.maven.project.DefaultProjectBuilder;
+
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

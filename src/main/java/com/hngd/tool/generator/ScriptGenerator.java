@@ -6,12 +6,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import com.hngd.tool.ScriptGeneratorContext;
 import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.constant.Constants;
 import com.hngd.tool.exception.ScriptGenerationException;
@@ -43,12 +39,14 @@ public abstract class ScriptGenerator {
         return script;
     }
 
-    protected void doGenerateConsoleScript(Map<String,Object> context,File outputDir,String templateName,String targetFileName,
+    protected List<File> doGenerateConsoleScript(Map<String,Object> context,File outputDir,String templateName,String targetFileName,
                                            String additionalFileNamePattern){
+        List<File> scripts=new ArrayList<>();
         Template run=groupTemplate.getTemplate(templateName);
         File runBatFile=new File(outputDir,targetFileName);
-        String script=ScriptGenerator.renderAndWrite(context,run,runBatFile);
-        List<String> additionalMainClassNames=ScriptGenerator.parseAdditionalMainClassNames(context);
+        String script=renderAndWrite(context,run,runBatFile);
+        scripts.add(runBatFile);
+        List<String> additionalMainClassNames=parseAdditionalMainClassNames(context);
         String mainClassName=(String) context.get(ConfigItems.KEY_MAIN_CLASS);
         for(String additionalMainClassName:additionalMainClassNames) {
             String newScript=script.replace(mainClassName, additionalMainClassName);
@@ -56,13 +54,15 @@ public abstract class ScriptGenerator {
             File additionalRunBatFile=new File(outputDir,additionalFileName);
             try {
                 Files.write(additionalRunBatFile.toPath(), newScript.getBytes(), StandardOpenOption.CREATE);
+                scripts.add(additionalRunBatFile);
             } catch (BeetlException | IOException e) {
                 throw new ScriptGenerationException("File write error:"+additionalRunBatFile.getAbsolutePath(),e);
             }
         }
+        return scripts;
     }
 
-    protected void doCopyResource(String resourcePath,File outputDir,String targetFileName){
+    protected File doCopyResource(String resourcePath,File outputDir,String targetFileName){
         File targetFile=new File(outputDir,targetFileName);
         if(targetFile.exists()) {
             targetFile.delete();
@@ -72,6 +72,7 @@ public abstract class ScriptGenerator {
         }catch(IOException e) {
             throw new ScriptGenerationException("Failed to copy Resource ["+resourcePath+"] into ["+targetFile.getAbsolutePath()+"]",e);
         }
+        return targetFile;
     }
 
     /**

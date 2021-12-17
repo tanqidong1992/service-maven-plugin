@@ -17,7 +17,6 @@
 		<aether-api.version>1.1.0</aether-api.version>
 		<slf4j.version>1.7.32</slf4j.version>
 		<junit.version>5.8.2</junit.version>
-		<jmh.version>1.33</jmh.version>
 	</properties>
 	<developers>
 		<developer>
@@ -90,22 +89,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.12.0</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
 			<version>1.21</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-core</artifactId>
-			<version>${jmh.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-generator-annprocess</artifactId>
-			<version>${jmh.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -192,6 +181,7 @@
 					<include>**/*.exe</include>
 					<include>**/*.service</include>
 					<include>**/*.spec</include>
+					<include>**/tools/*</include>
 				</includes>
 			</resource>
 		</resources>
@@ -218,5 +208,4 @@
 			<url>http://localhost:8082/nexus/content/repositories/snapshots/</url>
 		</repository>
 	</distributionManagement>
-
 </project>

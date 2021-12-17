@@ -1,4 +1,4 @@
-package com.hngd.tool.utils;
+package com.hngd.tool.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
@@ -21,6 +21,7 @@ import com.hngd.tool.constant.Constants;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class BuildInfoUtils {
 
@@ -28,7 +29,7 @@ public class BuildInfoUtils {
     public static void generateBuildInfo(File projectBaseDir,File output) throws IOException {
         File gitDir=new File(projectBaseDir,".git");
         if(!gitDir.exists() || !gitDir.isDirectory()) {
-            log.info("The project is not a git repository");
+            log.warn("The project is not a git repository");
             return ;
         }
         Repository repository=new  RepositoryBuilder()

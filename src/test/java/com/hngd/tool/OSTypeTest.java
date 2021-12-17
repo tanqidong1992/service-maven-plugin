@@ -1,6 +1,6 @@
 package com.hngd.tool;
 
-import com.hngd.tool.utils.JreUtils;
+import com.hngd.tool.util.JreUtils;
 
 public class OSTypeTest {
 

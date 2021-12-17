@@ -1,4 +1,4 @@
-package com.hngd.tool.utils;
+package com.hngd.tool.util;
 
 import java.io.File;
 import java.io.IOException;
