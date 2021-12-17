@@ -11,6 +11,9 @@ License: ${_projectLicense}
  <% } %>
 Source0: ${serviceName}
 
+%global __requires_exclude_from ^.*/%{name}/jre/.*$
+%global __provides_exclude_from ^.*/%{name}/jre/.*$
+
 %description
 ${serviceDescription}
 

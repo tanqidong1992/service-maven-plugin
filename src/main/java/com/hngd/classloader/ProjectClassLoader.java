@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *工程类加载器
+ * Project class loader
  * @author tqd
  *
  */

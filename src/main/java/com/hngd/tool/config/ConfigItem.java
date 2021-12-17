@@ -1,9 +1,6 @@
 package com.hngd.tool.config;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
-
-import org.apache.commons.beanutils.BeanUtils;
 
 import com.hngd.tool.exception.ScriptGenerationException;
 
@@ -55,11 +52,10 @@ public class ConfigItem {
             throw new ScriptGenerationException("缺少必要的配置项:"+this.name, null);
         }
         NameValuePair nameValuePair=new NameValuePair();
-        try {
-            BeanUtils.copyProperties(nameValuePair, this);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new ScriptGenerationException("读取配置项:"+this.name+"出现错误", e);
-        }
+        nameValuePair.setName(this.name);
+        nameValuePair.setDefaultValue(this.defaultValue);
+        nameValuePair.setRequired(this.required);
+        nameValuePair.setRefIfAbsent(this.refIfAbsent);
         nameValuePair.setValue(value);
         return nameValuePair;
     }
