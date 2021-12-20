@@ -21,6 +21,8 @@ public class ConfigItems {
     public static final String INNER_PROJECT_URL="_projectUrl";
     public static final String INNER_PROJECT_LICENSE="_projectLicense";
 
+    public static final String KEY_WITH_JRE = "withJre";
+
     public static final String KEY_SUPPORT_SERVICE = "supportService";
     public static final String KEY_SERVICE_DESCRIPTION = "serviceDescription";
     public static final String KEY_SERVICE_DISPLAY_NAME = "serviceDisplayName";

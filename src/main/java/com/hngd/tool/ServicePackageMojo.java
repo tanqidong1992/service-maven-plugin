@@ -110,6 +110,12 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(required = false,defaultValue = "network.target")
     public String after;
 
+    /**
+     * if true,bind the JRE,default value is true
+     */
+    @Parameter(required = false,defaultValue = "true")
+    public Boolean withJre;
+
     Log log;
 
     @Override
@@ -190,13 +196,39 @@ public class ServicePackageMojo extends AbstractMojo {
                     serviceType,
                     outputRpmSpec,
                     after,
-                    wantedBy);
+                    wantedBy,
+                    withJre);
         } catch (ScriptGenerationException e) {
             log.error("", e);
             throw new MojoExecutionException("Generate scripts failed!",e);
         }
 
         log.debug("Copy or custom java runtime image");
+        if(withJre) {
+            bindJre(mainJarFile,dependentLibDirectory);
+        }
+        log.info("Generate build info");
+        try {
+            BuildInfoUtils.generateBuildInfo(mavenProject.getBasedir(), outputDirectory);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Generate build info failed!", e);
+        }
+        String archiveType;
+        if(ServiceTypes.SYSTEMD.equals(serviceType)) {
+            archiveType="tar.gz";
+        }else {
+            archiveType="zip";
+        }
+        File archiveFile=new File(mavenProject.getBuild().getDirectory(),
+                mavenProject.getArtifactId()+"."+archiveType);
+        
+        if(outputZip) {
+            log.info("Package the output archive");
+            CompressUtils.compress(archiveFile, outputDirectory);
+        }
+    }
+
+    private void bindJre(File mainJarFile,File dependentLibDirectory) throws MojoExecutionException {
         File outputJreDirectory = new File(outputDirectory, "jre");
         outputJreDirectory.mkdirs();
         if(jreDirectory==null && customRuntimeImage && JreUtils.atLeastJava11()) {
@@ -224,26 +256,6 @@ public class ServicePackageMojo extends AbstractMojo {
                         jreDirectory.getAbsolutePath()
                         +"] failed!",e);
             }
-        }
-        
-        log.info("Generate build info");
-        try {
-            BuildInfoUtils.generateBuildInfo(mavenProject.getBasedir(), outputDirectory);
-        } catch (IOException e) {
-            throw new MojoExecutionException("Generate build info failed!", e);
-        }
-        String archiveType;
-        if(ServiceTypes.SYSTEMD.equals(serviceType)) {
-            archiveType="tar.gz";
-        }else {
-            archiveType="zip";
-        }
-        File archiveFile=new File(mavenProject.getBuild().getDirectory(),
-                mavenProject.getArtifactId()+"."+archiveType);
-        
-        if(outputZip) {
-            log.info("Package the output archive");
-            CompressUtils.compress(archiveFile, outputDirectory);
         }
     }
  

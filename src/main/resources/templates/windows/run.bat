@@ -7,7 +7,14 @@ set APP_BASE_NAME=%~n0
 set APP_BASE_DIR=%DIRNAME%
 set CMD_LINE_ARGS=%*
 
-"%APP_BASE_DIR%/jre/bin/java.exe" ^
+<% if(has(withJre)) {%>
+set JAVA="%APP_BASE_DIR%\jre\bin\java.exe"
+<%}else{%>
+set JAVA="%JAVA_HOME%\bin\java.exe"
+if "%JAVA_HOME%" == "" set JAVA="java.exe"
+<%}%>
+
+"%JAVA%" ^
 <% if(has(javaRunOptions)) {%>
 ${javaRunOptions} ^
 <%}%>

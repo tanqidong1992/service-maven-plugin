@@ -10,10 +10,10 @@ URL: ${_projectUrl}
 License: ${_projectLicense}
  <% } %>
 Source0: ${serviceName}
-
+<% if(has(withJre)) {%>
 %global __requires_exclude_from ^.*/%{name}/jre/.*$
 %global __provides_exclude_from ^.*/%{name}/jre/.*$
-
+ <% } %>
 %description
 ${serviceDescription}
 

@@ -6,13 +6,20 @@ if "%DIRNAME%" == "" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_BASE_DIR=%DIRNAME%
 
+<% if(has(withJre)) {%>
+set JVM="%APP_BASE_DIR%\jre\bin\server\jvm.dll"
+<%}else{%>
+set JVM="%JAVA_HOME%\bin\server\jvm.dll"
+@rem if "%JAVA_HOME%" == "" set JVM="jvm.dll"
+<%}%>
+
 prunsrv //IS//${serviceName} ^
  --Description "${serviceDescription}" ^
  --DisplayName="${serviceDisplayName}" ^
  <% if(has(startup)) {%>
  --Startup=${startup} ^
  <% } %>
- --Jvm="%APP_BASE_DIR%\jre\bin\server\jvm.dll" ^
+ --Jvm="%JVM%" ^
  --StartPath="%~dp0\" ^
  --StopPath="%~dp0\" ^
  --StartMode=jvm ^

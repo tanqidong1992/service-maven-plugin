@@ -33,8 +33,8 @@ public class SystemdScriptGenerator extends ScriptGenerator {
         File svc=doCopyResource("/templates/systemd/svc.sh",outputDir,"svc.sh");
         if(JreUtils.isLinux()) {
             ScriptCompiler.getInstance().compile(svc, svc);
+            ScriptUtils.addExecutePermission(svc);
         }
-        ScriptUtils.addExecutePermission(svc);
         //copy service unit template
         doCopyResource("/templates/systemd/sample.service",outputDir,"sample.service");
     }
@@ -42,13 +42,14 @@ public class SystemdScriptGenerator extends ScriptGenerator {
     @Override
     public void generateConsoleScript(File outputDir, Map<String, Object> context) {
         List<File> files= doGenerateConsoleScript(context,outputDir,RUN,RUN,"run-foreground.%s.sh");
-        for (File file:files){
-            try {
-                ScriptUtils.addExecutePermission(file);
-            } catch (IOException e) {
-                logger.error("",e);
+        if(JreUtils.isLinux()){
+            for (File file:files){
+                try {
+                    ScriptUtils.addExecutePermission(file);
+                } catch (IOException e) {
+                    logger.error("",e);
+                }
             }
         }
     }
-
 }

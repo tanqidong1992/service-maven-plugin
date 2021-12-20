@@ -47,26 +47,13 @@ function stop(){
     fi
     echo "The service is not started!"
 }
-function generateServiceUnitFile(){
 
-    if [ -z "$1" ]; then
-        transformedAppRoot=$(echo "${BASE_DIR}" | sed "s/\//\\\\\//g")
-    else   
-        transformedAppRoot=$(echo "${1}" | sed "s/\//\\\\\//g") 
-    fi
-
-    echo "transformed app root :${transformedAppRoot}"
-    sed "s/{{wantedBy}}/${wantedBy}/g;s/{{after}}/${after}/g;s/{{serviceDescription}}/${serviceDescription}/g;s/{{serviceName}}/${serviceName}/g;s/{{AppRoot}}/${transformedAppRoot}/g" ${BASE_DIR}/sample.service  > ${BASE_DIR}/${serviceName}.service
-    cat ${BASE_DIR}/${serviceName}.service
-    echo
-}
 function installService(){
     echo "Install service"
     if [ -e "${installationPath}/${serviceName}.service" ]; then
         echo "The service is already installed!"
     else
-        generateServiceUnitFile
-        mv "${WORK_DIR}/${serviceName}.service" "${installationPath}/${serviceName}.service"
+        cp "${WORK_DIR}/${serviceName}.service" "${installationPath}/${serviceName}.service"
         systemctl daemon-reload
         systemctl enable ${serviceName}.service
     fi
@@ -122,9 +109,6 @@ case "$op" in
   uninstall)
       requireRunAsRoot
       uninstallService
-  ;;
-  guf)
-      generateServiceUnitFile $2
   ;;
   *)
   echo 

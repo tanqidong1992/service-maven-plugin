@@ -13,6 +13,7 @@ public class RpmSpecGenerator extends ScriptGenerator{
 
     public static final String SPEC ="sample.spec";
     public static final String RPMBUILD_BUILD ="rpmbuild-build.sh";
+    public static final String SVC_RPM ="/templates/rpm/svc-rpm.sh";
     public static final String SCRIPT_TEMPLATE_ROOT="/templates/rpm";
 
     public RpmSpecGenerator() {
@@ -28,5 +29,7 @@ public class RpmSpecGenerator extends ScriptGenerator{
         //restore version
         context.put(ConfigItems.INNER_PROJECT_VERSION,originVersion);
         doGenerateScript(context,outputDir,RPMBUILD_BUILD,RPMBUILD_BUILD);
+
+        doCopyResource(SVC_RPM,outputDir,"svc-rpm.sh");
     }
 }

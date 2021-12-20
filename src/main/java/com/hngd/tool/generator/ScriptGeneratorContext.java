@@ -40,7 +40,7 @@ public class ScriptGeneratorContext {
             String serviceType,
             Boolean outputRpmSpec,
             String after,
-            String wantedBy) throws ScriptGenerationException{
+            String wantedBy, boolean withJre) throws ScriptGenerationException{
          
         String configPath=configFile!=null?configFile.getAbsolutePath():null;
         Properties properties=new Properties();
@@ -59,6 +59,9 @@ public class ScriptGeneratorContext {
         Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
         context.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
         context.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
+        if(withJre){
+            context.put(ConfigItems.KEY_WITH_JRE,"true");
+        }
         injectMavenProperties(context,mavenContext);
 
         if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
