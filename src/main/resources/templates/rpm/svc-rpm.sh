@@ -26,7 +26,7 @@ function start(){
             return 0
         fi
     fi
-    nohup ${WORK_DIR}/run-foreground.sh &
+    nohup ${WORK_DIR}/run-foreground.sh >>/dev/null 2>&1 &
     if [ $? -eq 0 ]; then
         echo "$!" > ${WORK_DIR}/${serviceName}.pid
         return 0

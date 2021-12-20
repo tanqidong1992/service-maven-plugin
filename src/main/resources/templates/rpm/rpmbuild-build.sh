@@ -17,7 +17,6 @@ cp -r ${serviceName} ~/rpmbuild/SOURCES
 ~/rpmbuild/SOURCES/${serviceName}/svc.sh guf /opt/${serviceName}
 rm ~/rpmbuild/SOURCES/${serviceName}/svc.sh
 rm ~/rpmbuild/SOURCES/${serviceName}/sample.service
-rm ~/rpmbuild/SOURCES/${serviceName}/svc.sh
 cp svc-rpm.sh ~/rpmbuild/SOURCES/${serviceName}/svc.sh
 rpmbuild -ba ~/rpmbuild/SPECS/${serviceName}.spec
 

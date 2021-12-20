@@ -5,13 +5,13 @@ APP_BASE_DIR=$(dirname \${scriptFilePath})
 CMD_LINE_ARGS=$@
 
 <% if(has(withJre)) {%>
-    JAVA=\${APP_BASE_DIR}/jre/bin/java
+JAVA=\${APP_BASE_DIR}/jre/bin/java
 <%}else{%>
-    if [ -z "\${JAVA_HOME}" ]; then
-        JAVA="java"
-    else
-        JAVA="\${JAVA_HOME}/bin/java"
-    fi
+if [ -z "\${JAVA_HOME}" ]; then
+    JAVA="java"
+else
+    JAVA="\${JAVA_HOME}/bin/java"
+fi
 <%}%>
 
 $JAVA \
