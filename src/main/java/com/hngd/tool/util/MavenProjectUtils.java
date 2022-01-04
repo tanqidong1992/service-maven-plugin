@@ -65,7 +65,7 @@ public class MavenProjectUtils {
             if(optional!=null && optional) {
                 return false;
             }
-            // we only want compile/runtime deps
+            // we only want to compile/runtime dependents
             String scope=node.getDependency().getScope();
             return Artifact.SCOPE_COMPILE_PLUS_RUNTIME.contains(scope) || Artifact.SCOPE_SYSTEM.contains(scope);
         };

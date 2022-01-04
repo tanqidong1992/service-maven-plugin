@@ -120,7 +120,6 @@ public class ServicePackageMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        
         log = getLog();
         if(serviceType==null) {
             if(JreUtils.isLinux()) {
@@ -185,7 +184,10 @@ public class ServicePackageMojo extends AbstractMojo {
             log.error("",e);
             throw new MojoExecutionException("Copy resources failed!",e);
         }
-
+        if(System.getProperties().containsKey("withJre")){
+            String withJreStr=System.getProperty("withJre");
+            withJre=Boolean.valueOf(withJreStr);
+        }
         log.info("Generate scripts");
         try {
             ScriptGeneratorContext.generateScripts(mavenProject,
@@ -229,6 +231,9 @@ public class ServicePackageMojo extends AbstractMojo {
     }
 
     private void bindJre(File mainJarFile,File dependentLibDirectory) throws MojoExecutionException {
+        if(System.getProperties().containsKey("jreDirectory")){
+            jreDirectory=new File(System.getProperty("jreDirectory"));
+        }
         File outputJreDirectory = new File(outputDirectory, "jre");
         outputJreDirectory.mkdirs();
         if(jreDirectory==null && customRuntimeImage && JreUtils.atLeastJava11()) {

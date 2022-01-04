@@ -3,6 +3,7 @@ package com.hngd.tool.util;
 import java.io.File;
 import java.io.IOException;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.utils.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -28,8 +30,17 @@ public class BuildInfoUtils {
     public static final String DEFAULT_VERSION="0.0.1";
     public static void generateBuildInfo(File projectBaseDir,File output) throws IOException {
         File gitDir=new File(projectBaseDir,".git");
+
+        //git submodules
+        if(gitDir.isFile()){
+            //gitdir: ../.git/modules/test
+            String s=FileUtils.readFileToString(gitDir, StandardCharsets.UTF_8.name());
+            String relativePath=s.trim().replace("gitdir: ","");
+            gitDir=new File(projectBaseDir,relativePath);
+        }
+
         if(!gitDir.exists() || !gitDir.isDirectory()) {
-            log.warn("The project is not a git repository");
+            log.warn("The project is not a git repository:"+gitDir.getAbsolutePath());
             return ;
         }
         Repository repository=new  RepositoryBuilder()
@@ -65,6 +76,7 @@ public class BuildInfoUtils {
         }
         Files.write(new File(output,"build-info.properties").toPath(),
                 buildInfo.toPropertiesString().getBytes(Constants.DEFAULT_CHARSET), StandardOpenOption.CREATE);
+        log.info("write to "+new File(output,"build-info.properties").getAbsolutePath());
     }
     
     @Data
