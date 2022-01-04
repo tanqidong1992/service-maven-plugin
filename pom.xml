@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>com.ibeetl</groupId>
 			<artifactId>beetl</artifactId>
-			<version>3.9.0.RELEASE</version>
+			<version>3.9.1.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.maven</groupId>

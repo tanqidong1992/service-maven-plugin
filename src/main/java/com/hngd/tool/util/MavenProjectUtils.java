@@ -61,10 +61,6 @@ public class MavenProjectUtils {
                 // if nothing, then ignore
                 return false;
             }
-            if (projectArtifacts.contains(node.getArtifact().toString())) {
-                // ignore project dependency artifacts
-                return false;
-            }
             Boolean optional=node.getDependency().getOptional();
             if(optional!=null && optional) {
                 return false;
