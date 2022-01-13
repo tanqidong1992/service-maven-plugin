@@ -20,6 +20,7 @@ public class SystemdScriptGenerator extends ScriptGenerator {
     private static final Logger logger= LoggerFactory.getLogger(SystemdScriptGenerator.class);
     public static final String ENV="env.sh";
     public static final String RUN="run-foreground.sh";
+    public static final String SAMPLE="sample.service";
     public static final String SCRIPT_TEMPLATE_ROOT="/templates/systemd";
 
     public SystemdScriptGenerator() {
@@ -29,14 +30,13 @@ public class SystemdScriptGenerator extends ScriptGenerator {
     @Override
     public void generateServiceScript(File outputDir, Map<String, Object> context)  throws BeetlException, IOException{
         doGenerateScript(context,outputDir,ENV,ENV);
+        doGenerateScript(context,outputDir,SAMPLE,SAMPLE);
         //copy svc.sh
         File svc=doCopyResource("/templates/systemd/svc.sh",outputDir,"svc.sh");
         if(JreUtils.isLinux()) {
             ScriptCompiler.getInstance().compile(svc, svc);
             ScriptUtils.addExecutePermission(svc);
         }
-        //copy service unit template
-        doCopyResource("/templates/systemd/sample.service",outputDir,"sample.service");
     }
 
     @Override

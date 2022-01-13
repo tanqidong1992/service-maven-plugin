@@ -12,6 +12,7 @@ public class ConfigItems {
 
     public static final String SYSTEMD_UNIT_AFTER="after";
     public static final String SYSTEMD_UNIT_WANTED_BY="wantedBy";
+    public static final String SYSTEMD_UNIT_ENVIRONMENT="environment";
 
     public static final String INNER_PROJECT_NAME="_projectName";
     public static final String INNER_PROJECT_DESCRIPTION="_projectDescription";
@@ -20,7 +21,7 @@ public class ConfigItems {
     public static final String INNER_PROJECT_VERSION="_projectVersion";
     public static final String INNER_PROJECT_URL="_projectUrl";
     public static final String INNER_PROJECT_LICENSE="_projectLicense";
-
+    public static final String KEY_ARGS = "args";
     public static final String KEY_WITH_JRE = "withJre";
 
     public static final String KEY_SUPPORT_SERVICE = "supportService";
@@ -29,7 +30,7 @@ public class ConfigItems {
     public static final String KEY_SERVICE_NAME = "serviceName";
     public static final String KEY_JVM_MS = "jvmMs";
     public static final String KEY_JVM_MX = "jvmMx";
-    public static final String KEY_JAVA_RUN_OPTIONS = "javaRunOptions";
+    public static final String KEY_JVM_FLAGS = "jvmFlags";
     public static final String KEY_MAIN_CLASS = "mainClass";
     public static final String KEY_ADDITIONAL_MAIN_CLASS = "additionalMainClass";
     public static final String KEY_START_METHOD = "startMethod";
@@ -52,7 +53,7 @@ public class ConfigItems {
     /**
      * java启动参数
      */
-    public static ConfigItem JAVA_RUN_OPTIONS = new ConfigItem(KEY_JAVA_RUN_OPTIONS, false, null);
+    public static ConfigItem JVM_FLAGS = new ConfigItem(KEY_JVM_FLAGS, false, null);
     /**
      * 虚拟机堆内存最小值
      */

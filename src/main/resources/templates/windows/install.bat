@@ -32,6 +32,9 @@ prunsrv //IS//${serviceName} ^
  <% if(has(jvmMx)) {%>
    --JvmMx=${jvmMx} ^
  <% } %>
+  <% if(has(args)) {%>
+   --StartParams=${args} ^
+ <% } %>
  --Classpath="${classPath}" ^
  --StartClass=${mainClass} ^
  --StopClass=${mainClass} ^

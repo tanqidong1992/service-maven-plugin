@@ -15,8 +15,8 @@ if "%JAVA_HOME%" == "" set JAVA="java.exe"
 <%}%>
 
 "%JAVA%" ^
-<% if(has(javaRunOptions)) {%>
-${javaRunOptions} ^
+<% if(has(jvmFlags)) {%>
+${jvmFlags} ^
 <%}%>
 <% if(has(jvmMs)) {%>
 -Xms${jvmMs} ^
@@ -24,4 +24,8 @@ ${javaRunOptions} ^
 <% if(has(jvmMs)) {%>
 -Xmx${jvmMx} ^
 <%}%>
--classpath "${classPath}" ${mainClass} %CMD_LINE_ARGS%
+-classpath "${classPath}" ${mainClass} ^
+<% if(has(args)) {%>
+${args} ^
+<%}%>
+%CMD_LINE_ARGS%

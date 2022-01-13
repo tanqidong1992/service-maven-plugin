@@ -39,8 +39,7 @@ public class ScriptGeneratorContext {
             File jarFile,
             String serviceType,
             Boolean outputRpmSpec,
-            String after,
-            String wantedBy, boolean withJre) throws ScriptGenerationException{
+            Map<String,String> mavenParameterContext) throws ScriptGenerationException{
          
         String configPath=configFile!=null?configFile.getAbsolutePath():null;
         Properties properties=new Properties();
@@ -55,16 +54,10 @@ public class ScriptGeneratorContext {
         }
         Map<String,Object> mavenContext=initializeMavenContext(mavenProject,jarFile.getAbsolutePath(),serviceType);
         fixAbsentProperties(properties,mavenContext);
-
         Map<String,Object> context=initializeConfigContext(properties,dependenciesDirectory,jarFile,serviceType);
-        context.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
-        context.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
-        if(withJre){
-            context.put(ConfigItems.KEY_WITH_JRE,"true");
-        }
-        injectMavenProperties(context,mavenContext);
-
-        if("true".equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
+        context.putAll(mavenContext);
+        context.putAll(mavenParameterContext);
+        if(Boolean.TRUE.toString().equals(context.get(ConfigItems.KEY_SUPPORT_SERVICE))) {
             try {
                 scriptGenerator.generateServiceScript(outputDir, context);
             } catch (BeetlException | IOException e) {
@@ -75,15 +68,6 @@ public class ScriptGeneratorContext {
         if(outputRpmSpec && ServiceTypes.SYSTEMD.equals(serviceType)){
             new RpmSpecGenerator().generateSpecFile(outputDir.getParentFile(),context);
         }
-    }
-
-    /**
-     * inject all maven properties to properties
-     * @param properties
-     * @param mavenContext
-     */
-    private static void injectMavenProperties(Map<String,Object> properties, Map<String, Object> mavenContext){
-        properties.putAll(mavenContext);
     }
 
     private static void fixAbsentProperties(Properties properties, Map<String, Object> mavenContext) {

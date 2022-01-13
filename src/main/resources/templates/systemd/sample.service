@@ -1,13 +1,16 @@
 [Unit]
-Description={{serviceDescription}}
-After={{after}}
+Description=${serviceDescription}
+After=${after}
 
 [Service]
 Type=forking
-PIDFile={{AppRoot}}/{{serviceName}}.pid
+PIDFile={{AppRoot}}/${serviceName}.pid
 ExecStart={{AppRoot}}/svc.sh doStart
 WorkingDirectory={{AppRoot}}
 TimeoutStopSec=5min
+<% if(has(environment)) {%>
+Environment=${environment}
+<%}%>
 
 [Install]
-WantedBy={{wantedBy}}
+WantedBy=${wantedBy}

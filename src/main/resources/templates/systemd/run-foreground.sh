@@ -15,8 +15,8 @@ fi
 <%}%>
 
 $JAVA \
-<% if(has(javaRunOptions)) {%>
-${javaRunOptions} \
+<% if(has(jvmFlags)) {%>
+${jvmFlags} \
 <%}%>
 <% if(has(jvmMs)) {%>
 -Xms${jvmMs} \
@@ -24,4 +24,8 @@ ${javaRunOptions} \
 <% if(has(jvmMx)) {%>
 -Xmx${jvmMx} \
 <%}%>
--classpath ${classPath} ${mainClass} \${CMD_LINE_ARGS}
+-classpath ${classPath} ${mainClass} \
+<% if(has(args)) {%>
+${args} \
+<%}%>
+\${CMD_LINE_ARGS}

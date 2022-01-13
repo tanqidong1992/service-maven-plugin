@@ -2,8 +2,13 @@ package com.hngd.tool;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.hngd.tool.config.ConfigItems;
 import com.hngd.tool.generator.ScriptGeneratorContext;
 import com.hngd.tool.util.*;
 import org.apache.maven.execution.MavenSession;
@@ -116,6 +121,27 @@ public class ServicePackageMojo extends AbstractMojo {
     @Parameter(required = false,defaultValue = "true")
     public Boolean withJre;
 
+    /**
+     * The Environments for Systemd
+     */
+    @Parameter(required = false)
+    private List<MojoParameters.Environment> environments;
+    /**
+     * additional flags to pass into the JVM when running your application
+     */
+    @Parameter(required = false)
+    private List<String> jvmFlags;
+    /**
+     * additional program arguments appended to the command to start your application
+     */
+    @Parameter(required = false)
+    private List<String> args;
+    /**
+     * 	the main class to launch the application from.
+     */
+    @Parameter(required = false)
+    private String mainClass;
+
     Log log;
 
     @Override
@@ -188,6 +214,7 @@ public class ServicePackageMojo extends AbstractMojo {
             String withJreStr=System.getProperty("withJre");
             withJre=Boolean.valueOf(withJreStr);
         }
+        Map<String,String> mavenParameterContext=buildMavenParameterContext();
         log.info("Generate scripts");
         try {
             ScriptGeneratorContext.generateScripts(mavenProject,
@@ -197,9 +224,7 @@ public class ServicePackageMojo extends AbstractMojo {
                     mainJarFile,
                     serviceType,
                     outputRpmSpec,
-                    after,
-                    wantedBy,
-                    withJre);
+                    mavenParameterContext);
         } catch (ScriptGenerationException e) {
             log.error("", e);
             throw new MojoExecutionException("Generate scripts failed!",e);
@@ -228,6 +253,32 @@ public class ServicePackageMojo extends AbstractMojo {
             log.info("Package the output archive");
             CompressUtils.compress(archiveFile, outputDirectory);
         }
+    }
+
+    private Map<String, String> buildMavenParameterContext() {
+        Map<String,String> context=new HashMap<>();
+        context.put(ConfigItems.SYSTEMD_UNIT_AFTER,after);
+        context.put(ConfigItems.SYSTEMD_UNIT_WANTED_BY,wantedBy);
+        if(withJre){
+            context.put(ConfigItems.KEY_WITH_JRE,Boolean.TRUE.toString());
+        }
+        if(environments!=null && environments.size()>0){
+            String envStr=SystemdUtils.buildEnvironment(environments);
+            context.put(ConfigItems.SYSTEMD_UNIT_ENVIRONMENT,envStr);
+        }
+        if(args!=null && args.size()>0){
+            String argsStr=args.stream().collect(Collectors.joining(" "));
+            context.put(ConfigItems.KEY_ARGS,argsStr);
+        }
+        if(mainClass!=null){
+            context.put(ConfigItems.KEY_MAIN_CLASS,mainClass);
+        }
+        if(jvmFlags!=null && jvmFlags.size()>0){
+            String jvmFlagsStr=jvmFlags.stream().collect(Collectors.joining(" "));
+            context.put(ConfigItems.KEY_JVM_FLAGS,jvmFlagsStr);
+        }
+        return context;
+
     }
 
     private void bindJre(File mainJarFile,File dependentLibDirectory) throws MojoExecutionException {
