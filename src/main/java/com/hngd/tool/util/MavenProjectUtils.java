@@ -38,8 +38,7 @@ public class MavenProjectUtils {
             .isPresent();
     }
     
-    public static List<File> toDependentLibFiles(DependencyResolutionResult resolutionResult)
-            throws MojoExecutionException {
+    public static List<File> toDependentLibFiles(DependencyResolutionResult resolutionResult) {
         List<File> files = resolutionResult.getDependencies().stream()
             .map(Dependency::getArtifact)
             .map(org.eclipse.aether.artifact.Artifact::getFile)

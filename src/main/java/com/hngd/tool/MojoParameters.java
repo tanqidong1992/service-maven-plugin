@@ -11,12 +11,12 @@ public class MojoParameters {
         /**
          * source directory or file
          */
-        @Parameter
+        @Parameter(required = true)
         private File from;
         /**
          * destination directory or file
          */
-        @Parameter
+        @Parameter(required = true)
         private String into;
         
         public File getFrom() {
@@ -36,8 +36,15 @@ public class MojoParameters {
     }
 
     public static class Environment{
-        @Parameter
+
+        /**
+         * name of env variable
+         */
+        @Parameter(required = true)
         private String name;
+        /**
+         * value of env variable
+         */
         @Parameter
         private String value;
 
