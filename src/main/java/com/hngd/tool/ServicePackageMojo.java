@@ -141,6 +141,11 @@ public class ServicePackageMojo extends AbstractMojo {
      */
     @Parameter(required = false)
     private String mainClass;
+    /**
+     * systemd restart
+     */
+    @Parameter(required = false,defaultValue = "always")
+    public String restart;
 
     Log log;
 
@@ -264,7 +269,9 @@ public class ServicePackageMojo extends AbstractMojo {
         }
         if(environments!=null && environments.size()>0){
             String envStr=SystemdUtils.buildEnvironment(environments);
-            context.put(ConfigItems.SYSTEMD_UNIT_ENVIRONMENT,envStr);
+            if(envStr!=null && envStr.length()>0) {
+                context.put(ConfigItems.SYSTEMD_UNIT_ENVIRONMENT, envStr);
+            }
         }
         if(args!=null && args.size()>0){
             String argsStr=args.stream().collect(Collectors.joining(" "));
@@ -276,6 +283,9 @@ public class ServicePackageMojo extends AbstractMojo {
         if(jvmFlags!=null && jvmFlags.size()>0){
             String jvmFlagsStr=jvmFlags.stream().collect(Collectors.joining(" "));
             context.put(ConfigItems.KEY_JVM_FLAGS,jvmFlagsStr);
+        }
+        if(restart!=null){
+            context.put(ConfigItems.SYSTEMD_UNIT_RESTART,restart);
         }
         return context;
 

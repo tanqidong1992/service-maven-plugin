@@ -13,6 +13,8 @@ public class ConfigItems {
     public static final String SYSTEMD_UNIT_AFTER="after";
     public static final String SYSTEMD_UNIT_WANTED_BY="wantedBy";
     public static final String SYSTEMD_UNIT_ENVIRONMENT="environment";
+    public static final String SYSTEMD_UNIT_RESTART="restart";
+
 
     public static final String INNER_PROJECT_NAME="_projectName";
     public static final String INNER_PROJECT_DESCRIPTION="_projectDescription";

@@ -11,6 +11,10 @@ TimeoutStopSec=5min
 <% if(has(environment)) {%>
 Environment=${environment}
 <%}%>
+<% if(has(restart)) {%>
+Restart=${restart}
+RestartSec=5
+<%}%>
 
 [Install]
 WantedBy=${wantedBy}
