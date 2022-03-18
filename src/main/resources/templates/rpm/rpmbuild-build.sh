@@ -18,7 +18,11 @@ cp -r ${serviceName} ~/rpmbuild/SOURCES
 rm ~/rpmbuild/SOURCES/${serviceName}/svc.sh
 rm ~/rpmbuild/SOURCES/${serviceName}/sample.service
 cp svc-rpm.sh ~/rpmbuild/SOURCES/${serviceName}/svc.sh
-rpmbuild -ba ~/rpmbuild/SPECS/${serviceName}.spec
+
+op=$1
+if [ "prepare" != "$op" ]; then
+    rpmbuild -ba ~/rpmbuild/SPECS/${serviceName}.spec
+fi
 
 
 
