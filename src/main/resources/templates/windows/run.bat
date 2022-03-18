@@ -14,7 +14,7 @@ set JAVA="%JAVA_HOME%\bin\java.exe"
 if "%JAVA_HOME%" == "" set JAVA="java.exe"
 <%}%>
 
-"%JAVA%" ^
+%JAVA% ^
 <% if(has(jvmFlags)) {%>
 ${jvmFlags} ^
 <%}%>
