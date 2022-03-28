@@ -18,6 +18,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+@Deprecated
 public class RepoTest {
 
     @Test
@@ -42,14 +43,16 @@ public class RepoTest {
         ArtifactHandler jarHandler=rule.lookup(ArtifactHandlerManager.class)
         		.getArtifactHandler("jar");
 		/**
-         	<groupId>org.openjdk.jmh</groupId>
-			<artifactId>jmh-generator-annprocess</artifactId>
-			<version>1.27</version>
-			<scope>test</scope>
+         <dependency>
+              <groupId>org.mockito</groupId>
+              <artifactId>mockito-core</artifactId>
+              <version>3.3.0</version>
+              <scope>test</scope>
+         </dependency>
          */
         DefaultArtifact da=
-        		new DefaultArtifact("org.openjdk.jmh", "jmh-generator-annprocess",
-        				"1.27", null, "jar", null, jarHandler);
+        		new DefaultArtifact("org.mockito", "jmockito-core",
+        				"3.3.0", null, "jar", null, jarHandler);
         arr.setArtifact(da);
         ArtifactResolutionResult ars=artifactResolver.resolve(arr);
         Assertions.assertTrue(ars.getArtifacts().size()==1);

@@ -16,7 +16,7 @@ import org.apache.maven.project.ProjectDependenciesResolver;
 import java.io.File;
 import java.util.List;
 
-
+@Deprecated
 @Mojo(name="dependency-test",defaultPhase = LifecyclePhase.PACKAGE)
 @Data
 public class DependencyTestMojo extends AbstractMojo {

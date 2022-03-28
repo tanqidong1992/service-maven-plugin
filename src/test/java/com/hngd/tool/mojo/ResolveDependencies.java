@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
  * @author tqd
  *
  */
+@Deprecated
 @Mojo(name = "dependencies", defaultPhase = LifecyclePhase.PACKAGE)
 public class ResolveDependencies extends AbstractMojo{
 
